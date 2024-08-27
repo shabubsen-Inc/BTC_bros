@@ -1,6 +1,5 @@
 from data.config import api_url
 from data.ingestion.fetch_fear_greed_data import fetch_fear_greed_data
-from data.processing.process_fear_greed_data import process_fear_greed_data
 from data.ingestion.fetch_ohlc_hourly_data import fetch_ohlc_data_from_api,access_secret_version,API_call_limiter, dates 
 from data.storage.store_in_db import bigquery_raw_data_table, stream_data_to_bigquery, client
 import logging
