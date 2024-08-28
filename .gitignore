@@ -4,6 +4,10 @@ __pycache__/
 
 # Ignore virtual environments
 src/venv
+venv
 
 # Ignore vscode settings
 .vscode
+
+# Ignore ruff cache
+.ruff_cache
