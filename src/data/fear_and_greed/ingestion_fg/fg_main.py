@@ -5,17 +5,17 @@ import logging
 
 
 def main():
-   #  Step 1: Ingest data
     fear_greed_data = fetch_fear_greed_data(api_url)
     print(fear_greed_data)
     
     raw_fear_greed_data = bigquery_raw_data_table(client=client, dataset_id='shabubsinc_db', table_id='raw_fear_greed_data',api_data=fear_greed_data)
 
     try:
-        stream_data_to_bigquery(client=client, data=raw_fear_greed_data, project_id='shabubsinc', dataset_id='shabubsinc_db', table_id='raw_fear_and_gread')
+        stream_data_to_bigquery(client=client, data=raw_fear_greed_data, project_id='shabubsinc', dataset_id='shabubsinc_db', table_id='raw_fear_greed_data')
     
     except Exception as e:
         logging.error(f"Failed to stream data to BigQuery: {e}")
+
 
 if __name__ == "__main__":
     main()
