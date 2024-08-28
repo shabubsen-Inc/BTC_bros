@@ -4,3 +4,6 @@ __pycache__/
 
 # Ignore virtual environments
 src/venv
+
+# Ignore vscode settings
+.vscode
