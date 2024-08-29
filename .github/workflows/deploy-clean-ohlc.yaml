@@ -1,0 +1,34 @@
+name: Deploy Cloud Function for OHLC Clean Data
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/[Function-Name]/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Deploy Cloud Function [Function-Name]
+        run: |
+          gcloud functions deploy [Function-Name] \
+            --region=us-central1 \
+            --runtime=python310 \
+            --trigger-http \
+            --entry-point=main \
+            --allow-unauthenticated \
+            --source=src/[Function-Name]
