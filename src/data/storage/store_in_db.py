@@ -55,7 +55,7 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
         api_data = [item for item in api_data['data'] if isinstance(item, dict)]
 
     for data_point in api_data:
-        try:
+        if 'time_period_start' in data_point:
               #this is for coinapi response
             if isinstance(data_point, dict):
                 data_modified = data_point["time_period_start"]
@@ -68,7 +68,7 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
                 rows_to_insert.append(row)
             else:
                 print("Encountered a non-dictionary item in the list. Skipping.")
-        except:
+        elif 'timestamp' in data_point:
             #this is for fear and gread response
             if isinstance(data_point, dict):
 
@@ -82,6 +82,8 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
                 rows_to_insert.append(row)
             else:
                 print("Encountered a non-dictionary item in the list. Skipping.")
+        else:
+            print(f"Warning: Neither 'timestamp' nor 'time_period_start' found in data point: {data_point}. Skipping this item.")
 
     if rows_to_insert:
         return rows_to_insert

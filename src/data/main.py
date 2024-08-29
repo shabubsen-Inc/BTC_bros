@@ -1,5 +1,4 @@
-from fear_and_greed.ingestion_fg.fetch_fear_greed_data import fetch_fear_greed_data
-from ohlc_hourly.ingestion_ohlc.fetch_ohlc_hourly_data import fetch_ohlc_data_from_api, headers, dates 
+from ohlc.ingestion.fetch_ohlc_hourly_data import fetch_ohlc_data_from_api, headers, dates 
 from storage.store_in_db import stream_data_to_bigquery, client, bigquery_raw_data_table
 import logging
 
