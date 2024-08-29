@@ -1,7 +1,6 @@
-from data.config import api_url
-from data.ingestion_fg.fetch_fear_greed_data import fetch_fear_greed_data
-from data.ingestion_ohlc.fetch_ohlc_hourly_data import fetch_ohlc_data_from_api,access_secret_version,API_call_limiter, dates 
-from data.storage.store_in_db import bigquery_raw_data_table, stream_data_to_bigquery, client
+
+from ohlc_hourly.ingestion_ohlc.fetch_ohlc_hourly_data import fetch_ohlc_data_from_api,access_secret_version,API_call_limiter, dates 
+from storage.store_in_db import bigquery_raw_data_table, stream_data_to_bigquery, client
 import logging
 
 max_calls_per_minute = 30
@@ -16,7 +15,8 @@ def main():
     all_call_counts = 0
     for date in dates:
         ohlc_data = fetch_ohlc_data_from_api(date,headers)
-        all_call_counts =+1 
+
+        all_call_counts = all_call_counts+1 
         print(all_call_counts)
         call_count = API_call_limiter(call_count, max_calls_per_minute, call_interval)
 

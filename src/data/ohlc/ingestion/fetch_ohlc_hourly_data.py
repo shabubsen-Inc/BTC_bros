@@ -6,8 +6,8 @@ import time
 
 PROJECT_ID = 'shabubsinc'
 
-start_date_str = '2017-08-23T00:00:00'
-end_date_str   = '2018-08-22T00:00:00'
+start_date_str = '2018-02-05T00:00:00'
+end_date_str   = '2019-08-24T00:00:00'
 
 start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%S")
 end_date   = datetime.strptime(end_date_str,   "%Y-%m-%dT%H:%M:%S")

@@ -47,9 +47,9 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
     rows_to_insert = []
 
     # Flatten the nested list structure of api_data
-    if isinstance(api_data, list) and len(api_data) > 0 and isinstance(api_data[0], list):
+    if isinstance(api_data, list) and len(api_data):
         #this is for coinapi response
-        api_data = [item for sublist in api_data for item in sublist]
+        api_data = api_data
     else:
         #this is for fear and gread response
         api_data = [item for item in api_data['data'] if isinstance(item, dict)]
@@ -66,7 +66,6 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
                     "raw_data": raw_data
                 }
                 rows_to_insert.append(row)
-                print("did this")
             else:
                 print("Encountered a non-dictionary item in the list. Skipping.")
         except:

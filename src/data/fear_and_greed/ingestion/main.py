@@ -8,10 +8,10 @@ def main():
     fear_greed_data = fetch_fear_greed_data(api_url)
     print(fear_greed_data)
     
-    raw_fear_greed_data = bigquery_raw_data_table(client=client, dataset_id='shabubsinc_db', table_id='raw_fear_greed_data',api_data=fear_greed_data)
+    raw_fear_greed_data = bigquery_raw_data_table(client=client, dataset_id='shabubsinc_db', table_id='raw_daily_fear_greed_data',api_data=fear_greed_data)
 
     try:
-        stream_data_to_bigquery(client=client, data=raw_fear_greed_data, project_id='shabubsinc', dataset_id='shabubsinc_db', table_id='raw_fear_greed_data')
+        stream_data_to_bigquery(client=client, data=raw_fear_greed_data, project_id='shabubsinc', dataset_id='shabubsinc_db', table_id='raw_daily_fear_greed_data')
     
     except Exception as e:
         logging.error(f"Failed to stream data to BigQuery: {e}")
