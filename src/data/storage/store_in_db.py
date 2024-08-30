@@ -50,10 +50,15 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
     # Flatten the nested list structure of api_data
     if isinstance(api_data, list) and len(api_data):
         #this is for coinapi response
-        api_data = api_data
-    else:
+        try:
+            api_data = api_data
+        except Exception as e:
+            logging.error(f"An error occurred while processing API data: {e}")
+    elif api_data:
         #this is for fear and gread response
         api_data = [item for item in api_data['data'] if isinstance(item, dict)]
+    else:
+        logging.warning("API data is empty.")
 
     for data_point in api_data:
         if 'time_period_start' in data_point:
