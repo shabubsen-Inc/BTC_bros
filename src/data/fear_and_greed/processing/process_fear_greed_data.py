@@ -1,5 +1,5 @@
 from google.cloud import bigquery
-from google.api_core.exceptions import NotFound
+from google.api_core.exceptions import NotFound, GoogleCloudError
 import time
 import logging
 
@@ -36,8 +36,13 @@ def ensure_bigquery_fear_greed_table(client, dataset_id, table_id):
             table = client.create_table(table)
             logging.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
             time.sleep(10)
-        except:
-            logging.error('failed to create table')
+
+        except NotFound as e:
+            logging.error(f"Failed to create table because the dataset or table was not found: {e}")
+        except GoogleCloudError as e:
+            logging.error(f"Google Cloud error occurred: {e}")
+        except Exception as e:
+            logging.error(f"An unexpected error occurred: {e}")
 
 def extract_required_fields(data):
     """
