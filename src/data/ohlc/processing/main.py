@@ -1,6 +1,6 @@
-from data.storage.fetch_data_from_db import get_all_data_from_bigquery
-from data.storage.store_in_db import stream_data_to_bigquery, client
-from data.ohlc_hourly.processing.process_ohlc_data import ensure_bigquery_ohlc_table
+from storage.fetch_data_from_db import get_all_data_from_bigquery
+from storage.store_in_db import stream_data_to_bigquery, client
+from ohlc.processing.process_ohlc_data import ensure_bigquery_ohlc_table
 import logging
 
 def ohlc(): 

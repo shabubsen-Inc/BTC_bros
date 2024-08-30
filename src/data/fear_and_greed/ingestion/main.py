@@ -1,6 +1,6 @@
-from data.config import api_url
-from data.fear_and_greed.ingestion_fg.fetch_fear_greed_data import fetch_fear_greed_data
-from data.storage.store_in_db import bigquery_raw_data_table, stream_data_to_bigquery, client
+from config import api_url
+from fear_and_greed.ingestion.fetch_fear_greed_data import fetch_fear_greed_data
+from storage.store_in_db import bigquery_raw_data_table, stream_data_to_bigquery, client
 import logging
 
 

@@ -5,6 +5,7 @@ from google.api_core.exceptions import NotFound
 import pendulum
 import json
 import time
+import logging
 
 client = bigquery.Client(project='shabubsinc')
 
@@ -23,22 +24,22 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
     try:
         # Check if the table already exists
         table = client.get_table(table_ref)
-        print(f"Table {table.project}.{table.dataset_id}.{table.table_id} exists.")
+        logging.info(f"Table {table.project}.{table.dataset_id}.{table.table_id} exists.")
 
         # Check if the table has a schema
         if not table.schema:
-            print("Table exists but has no schema. Updating the table schema.")
+            logging.info("Table exists but has no schema. Updating the table schema.")
             table.schema = desired_schema
             client.update_table(table, ["schema"])
-            print(f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}")
+            logging.info(f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}")
         else:
-            print("Table already has a schema. No need to create or update the table.")
+            logging.info("Table already has a schema. No need to create or update the table.")
 
     except NotFound:
-        print(f"Table does not exist. Creating table: {dataset_id}.{table_id}")
+        logging.info(f"Table does not exist. Creating table: {dataset_id}.{table_id}")
         table = bigquery.Table(table_ref, schema=desired_schema)
         table = client.create_table(table)
-        print(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+        logging.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
         time.sleep(5)
 
     # Get the current timestamp for when the API call was made
@@ -67,7 +68,8 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
                 }
                 rows_to_insert.append(row)
             else:
-                print("Encountered a non-dictionary item in the list. Skipping.")
+                logging.info("Encountered a non-dictionary item in the list. Skipping.")
+
         elif 'timestamp' in data_point:
             #this is for fear and gread response
             if isinstance(data_point, dict):
@@ -81,14 +83,14 @@ def bigquery_raw_data_table(client, dataset_id, table_id, api_data):
                 }
                 rows_to_insert.append(row)
             else:
-                print("Encountered a non-dictionary item in the list. Skipping.")
+                logging.info("Encountered a non-dictionary item in the list. Skipping.")
         else:
-            print(f"Warning: Neither 'timestamp' nor 'time_period_start' found in data point: {data_point}. Skipping this item.")
+            logging.warning(f"Warning: Neither 'timestamp' nor 'time_period_start' found in data point: {data_point}. Skipping this item.")
 
     if rows_to_insert:
         return rows_to_insert
     else:
-        print("No valid data to insert.")
+        logging.info("No valid data to insert.")
 
 
 def convert_datetime_to_string(data):
@@ -113,15 +115,15 @@ def stream_data_to_bigquery(client, data, project_id, dataset_id, table_id):
         data = [item for sublist in data for item in sublist]
      # Ensure data is a list of dictionaries
     if not all(isinstance(item, dict) for item in data):
-        print("Error: All items in the data must be dictionaries.")
+        logging.info("Error: All items in the data must be dictionaries.")
         return
 
     data = convert_datetime_to_string(data)
 
     errors = client.insert_rows_json(table=table, json_rows=data)
     if errors:
-        print("Encountered errors while inserting rows:")
+        logging.info("Encountered errors while inserting rows:")
         for error in errors:
-            print(error)
+            logging.info(error)
     else:
-        print("Data successfully streamed to BigQuery.")
+        logging.info("Data successfully streamed to BigQuery.")

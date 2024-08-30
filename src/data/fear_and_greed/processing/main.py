@@ -1,6 +1,6 @@
 from data.storage.fetch_data_from_db import get_all_data_from_bigquery
 from data.storage.store_in_db import stream_data_to_bigquery, client
-from data.fear_and_greed.processing_fg.process_fear_greed_data import ensure_bigquery_fear_greed_table, extract_required_fields
+from data.fear_and_greed.processing.process_fear_greed_data import ensure_bigquery_fear_greed_table, extract_required_fields
 import logging
 
 def fear_greed(): 
