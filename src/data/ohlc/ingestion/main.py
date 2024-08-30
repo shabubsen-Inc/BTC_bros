@@ -15,7 +15,7 @@ def main():
     for date in dates:
         ohlc_data = fetch_ohlc_data_from_api(date,headers)
         all_call_counts =+1 
-        print(all_call_counts)
+        logging.info(all_call_counts)
         call_count = API_call_limiter(call_count, max_calls_per_minute, call_interval)
 
         raw_ohlc_data = bigquery_raw_data_table(client=client, dataset_id='shabubsinc_db', table_id='raw_hourly_ohlc_data',api_data=ohlc_data)
