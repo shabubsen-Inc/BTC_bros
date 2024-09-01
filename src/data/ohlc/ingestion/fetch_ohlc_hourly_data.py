@@ -6,8 +6,8 @@ import time
 
 PROJECT_ID = 'shabubsinc'
 
-start_date_str = '2017-08-23T00:00:00'
-end_date_str   = '2018-08-22T00:00:00'
+start_date_str = '2018-02-05T00:00:00'
+end_date_str   = '2019-08-24T00:00:00'
 
 start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%S")
 end_date   = datetime.strptime(end_date_str,   "%Y-%m-%dT%H:%M:%S")
@@ -28,11 +28,11 @@ def API_call_limiter(call_count, max_calls_per_minute, call_interval):
         int: Updated call count after rate limiting.
     """
     if call_count >= max_calls_per_minute:
-        print("Reached call limit. Waiting for 60 seconds...")
+        logging.info("Reached call limit. Waiting for 60 seconds...")
         time.sleep(60)
         call_count = 0
     else:
-        print(f'current call count is {call_count}/30 before 60 sec pause')
+        logging.info(f'current call count is {call_count}/30 before 60 sec pause')
         time.sleep(call_interval)
 
     return call_count + 1
@@ -78,6 +78,6 @@ def fetch_ohlc_data_from_api(date, headers):
 
     if response.status_code == 200:
         data = response.json()
-        print(f"Error: {response.status_code} - {response.text}")
+        logging.info(f"Error: {response.status_code} - {response.text}")
            
         return data

@@ -1,5 +1,4 @@
 import json
-from google.cloud import bigquery
 
 def get_all_data_from_bigquery(client, dataset_id, table_id):
     """
@@ -22,22 +21,11 @@ def get_all_data_from_bigquery(client, dataset_id, table_id):
 
     results = query_job.result()
 
-    data = []
+    raw_data_list = []
 
     for row in results:
-        row_dict = dict(row)
-        
-        if 'raw_data' in row_dict:
-            json_data = json.loads(row_dict['raw_data'])
-            row_dict.update(json_data)  # Merge the JSON data into the row dictionary
-            del row_dict['raw_data']  # Remove the original JSON column
-        
-        data.append(row_dict)
+        # Parse the raw_data JSON string into a dictionary
+        raw_data_dict = json.loads(row["raw_data"])
+        raw_data_list.append(raw_data_dict)
     
-    return data
-
-client = bigquery.Client(project='shabubsinc')
-
-data = get_all_data_from_bigquery(client=client,dataset_id='shabubsinc_db',table_id='raw_hourly_data')
-
-print(data)
+    return raw_data_list
