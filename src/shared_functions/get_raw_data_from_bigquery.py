@@ -2,7 +2,10 @@ import json
 from typing import List, Dict
 from google.cloud import bigquery
 
-def get_all_data_from_bigquery(client: bigquery.Client, dataset_id: str, table_id: str) -> List[Dict]:
+
+def get_all_data_from_bigquery(
+    client: bigquery.Client, dataset_id: str, table_id: str
+) -> List[Dict]:
     """
     Retrieves all data from a specified table in BigQuery as a list of dictionaries.
 
@@ -19,7 +22,7 @@ def get_all_data_from_bigquery(client: bigquery.Client, dataset_id: str, table_i
     SELECT *
     FROM `{client.project}.{dataset_id}.{table_id}`
     """
-   
+
     query_job = client.query(query)
 
     results = query_job.result()
@@ -30,5 +33,5 @@ def get_all_data_from_bigquery(client: bigquery.Client, dataset_id: str, table_i
         # Parse the raw_data JSON string into a dictionary
         raw_data_dict = json.loads(row["raw_data"])
         raw_data_list.append(raw_data_dict)
-    
+
     return raw_data_list
