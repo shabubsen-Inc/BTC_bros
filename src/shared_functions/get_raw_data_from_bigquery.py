@@ -23,9 +23,9 @@ def get_all_data_from_bigquery(
     query = """ 
     SELECT * 
     FROM `{}`.`{}`.`{}` 
-    """.format( # nosec
-        client.project, dataset_id, table_id # nosec
-    ) # nosec
+    """.format(  # nosec
+        client.project, dataset_id, table_id  # nosec
+    )  # nosec
 
     query_job = client.query(query)
 
