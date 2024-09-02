@@ -1,5 +1,5 @@
 ---
-name: Code Formatting
+name: Security Analysis with Bandit
 
 on:
   push:
@@ -14,7 +14,7 @@ on:
       - "src/**/*.py"
 
 jobs:
-  format:
+  security-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install black
+          pip install bandit
 
-      - name: Run black to check formatting
+      - name: Run Bandit for security checks
         run: |
-          black --check src/
+          bandit -r src/
