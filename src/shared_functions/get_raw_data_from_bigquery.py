@@ -20,7 +20,7 @@ def get_all_data_from_bigquery(
     """
     query = """
     SELECT *
-    FROM `{}.{}.{}`
+    FROM `{}`.`{}`.`{}`
     """.format(
         client.project, dataset_id, table_id
     )
