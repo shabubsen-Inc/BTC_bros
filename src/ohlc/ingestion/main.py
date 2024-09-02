@@ -17,29 +17,21 @@ topic_path = publisher.topic_path("shabubsinc", "trigger-clean-ohlc")
 
 @app.post("/ingest/ohlc/raw")
 def ingest_ohlc_raw():
+    ohlc_data = fetch_ohlc_data_from_api(headers)
 
-    call_count = 0
-    all_call_counts = 0
-    for date in dates:
-        ohlc_data = fetch_ohlc_data_from_api(date, headers)
-        all_call_counts = +1
-        logging.info(all_call_counts)
-        call_count = API_call_limiter(
-            call_count, max_calls_per_minute, call_interval)
+    raw_ohlc_data = bigquery_raw_data_table(
+        client=bigquery_client, dataset_id='shabubsinc_db', table_id='raw_hourly_ohlc_data', api_data=ohlc_data)
 
-        raw_ohlc_data = bigquery_raw_data_table(
-            bigquery_client=bigquery_client, dataset_id='shabubsinc_db', table_id='raw_hourly_ohlc_data', api_data=ohlc_data)
+    try:
+        stream_data_to_bigquery(client=bigquery_client, data=raw_ohlc_data, project_id='shabubsinc',
+                                dataset_id='shabubsinc_db', table_id='raw_hourly_ohlc_data')
 
-        try:
-            stream_data_to_bigquery(bigquery_client=bigquery_client, data=raw_ohlc_data,
-                                    project_id='shabubsinc', dataset_id='shabubsinc_db', table_id='raw_hourly_ohlc_data')
-            publisher.publish(
-                topic_path, b"Trigger clean processing for ohlc")
+        publisher.publish(topic_path, b"Trigger clean processing for ohlc")
 
-            return {"status": "success"}
+        return {"status": "success"}
 
-        except Exception as e:
-            logging.error(f"Failed to stream data to BigQuery: {e}")
+    except Exception as e:
+        logging.error(f"Failed to stream data to BigQuery: {e}")
 
 
 if __name__ == "__main__":
