@@ -64,7 +64,7 @@ def fetch_ohlc_data_from_api(headers):
     url = "https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/latest?period_id=1HRS&limit=1"
 
     try:
-        response = requests.get(url, headers=headers,timeout=10)
+        response = requests.get(url, headers=headers, timeout=10)
 
     except requests.exceptions.HTTPError as http_err:
         logging.error(f"HTTP error occurred: {http_err}")
