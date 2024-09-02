@@ -3,9 +3,9 @@ name: Setup Cloud Scheduler for Fear & Greed Clean Data Fetch
 on:
   push:
     branches:
-      - main
+      - prod
     paths:
-      - "cloud-scheduler/fetch-fear-greed-clean-job.yaml"
+      - "src/fear_and_greed/processing/main.py"
 
 jobs:
   setup-scheduler:
@@ -24,16 +24,12 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
 
-      - name: Create/Update Cloud Scheduler Job for Fear & Greed Clean Data
-        run: |
-          gcloud scheduler jobs create http clean-fear-greed-job \
-            --schedule="5 0 * * *" \  # Every day at 00:05, 5 minutes after raw job
-            --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
-            --time-zone="UTC" \
-            --oauth-service-account-email=<your-service-account>@shabubsinc.iam.gserviceaccount.com || \
-          gcloud scheduler jobs update http clean-fear-greed-job \
-            --schedule="5 0 * * *" \  # Every day at 00:05, 5 minutes after raw job
-            --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
-            --time-zone="UTC"
+       - name: Deploy Cloud Function fear-greed-clean
+         run: |
+          gcloud functions deploy fear-greed-clean \
+            --region=europe-west1 \
+            --runtime=python310 \
+            --trigger-topic=trigger-clean-fear-greed \
+            --entry-point=ingest_fear_greed_clean \
+            --source=src/fear_and_greed/processing \
+            --allow-unauthenticated

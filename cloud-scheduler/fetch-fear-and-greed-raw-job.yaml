@@ -3,7 +3,7 @@ name: Setup Cloud Scheduler for Fear & Greed Raw Data Fetch
 on:
   push:
     branches:
-      - main
+      - prod
     paths:
       - "cloud-scheduler/fetch-fear-greed-raw-job.yaml"
 
@@ -29,11 +29,11 @@ jobs:
           gcloud scheduler jobs create http fetch-fear-greed-raw-job \
             --schedule="0 0 * * *" \  # Every day at midnight (00:00)
             --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
+            --uri=https://europe-west1-shabubsinc.cloudfunctions.net/fear-greed-raw \
             --time-zone="UTC" \
-            --oauth-service-account-email=<your-service-account>@shabubsinc.iam.gserviceaccount.com || \
+            --oauth-service-account-email=cloud-scheduler-sa@shabubsinc.iam.gserviceaccount.com || \
           gcloud scheduler jobs update http fetch-fear-greed-raw-job \
             --schedule="0 0 * * *" \  # Every day at midnight (00:00)
             --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
+            --uri=https://europe-west1-shabubsinc.cloudfunctions.net/fear-greed-raw \
             --time-zone="UTC"

@@ -3,7 +3,7 @@ name: Setup Cloud Scheduler for OHLC Raw Data Fetch
 on:
   push:
     branches:
-      - main
+      - prod
     paths:
       - "cloud-scheduler/fetch-ohlc-raw-job.yaml"
 
@@ -29,11 +29,11 @@ jobs:
           gcloud scheduler jobs create http fetch-ohlc-raw-job \
             --schedule="0 * * * *" \  # Every hour
             --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
+            --uri=https://europe-west1-shabubsinc.cloudfunctions.net/ohlc-raw \
             --time-zone="UTC" \
-            --oauth-service-account-email=<your-service-account>@shabubsinc.iam.gserviceaccount.com || \
+            --oauth-service-account-email=cloud-scheduler-sa@shabubsinc.iam.gserviceaccount.com || \
           gcloud scheduler jobs update http fetch-ohlc-raw-job \
             --schedule="0 * * * *" \  # Every hour
             --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
+            --uri=https://europe-west1-shabubsinc.cloudfunctions.net/ohlc-raw \
             --time-zone="UTC"

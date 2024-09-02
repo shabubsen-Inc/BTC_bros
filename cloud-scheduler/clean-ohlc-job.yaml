@@ -3,9 +3,9 @@ name: Setup Cloud Scheduler for OHLC Clean Data Fetch
 on:
   push:
     branches:
-      - main
+      - prod
     paths:
-      - "cloud-scheduler/clean-ohlc-job.yaml"
+      - "src/ohlc/processing/main.py"
 
 jobs:
   setup-scheduler:
@@ -24,16 +24,12 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
 
-      - name: Create/Update Cloud Scheduler Job for OHLC Hourly Clean Data
+     - name: Deploy Cloud Function ohlc-clean
         run: |
-          gcloud scheduler jobs create http clean-ohlc-job \
-            --schedule="5 * * * *" \  # 5 minutes after the raw hourly job
-            --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
-            --time-zone="UTC" \
-            --oauth-service-account-email=<your-service-account>@shabubsinc.iam.gserviceaccount.com || \
-          gcloud scheduler jobs update http clean-ohlc-job \
-            --schedule="5 * * * *" \  # 5 minutes after the raw hourly job
-            --http-method=POST \
-            --uri=https://<region>-shabubsinc.cloudfunctions.net/[Function-Name] \
-            --time-zone="UTC"
+          gcloud functions deploy ohlc-clean \
+            --region=europe-west1 \
+            --runtime=python310 \
+            --trigger-topic=trigger-clean-ohlc \
+            --entry-point=ingest_ohlc_clean \
+            --source=src/ohlc/processing \
+            --allow-unauthenticated
