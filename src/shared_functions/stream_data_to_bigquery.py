@@ -1,14 +1,22 @@
 import logging
+from typing import List, Dict, Union
 from google.cloud import bigquery
 from shared_functions.datetime_helper import convert_datetime_to_string
 
-def stream_data_to_bigquery(client, data, project_id: str, dataset_id:str, table_id:str):
+def stream_data_to_bigquery(
+    client: bigquery.Client, 
+    data: Union[List[Dict], List[List[Dict]]], 
+    project_id: str, 
+    dataset_id: str, 
+    table_id: str
+) -> None:
     """
     Streams data to a BigQuery table, handling nested lists and converting datetime objects.
 
     Args:
         client (bigquery.Client): An authenticated BigQuery client.
-        data (list of dict): The data to stream to BigQuery.
+        data (Union[List[Dict], List[List[Dict]]]): The data to stream to BigQuery, either a list of dictionaries 
+                                                    or a list of lists of dictionaries.
         project_id (str): The GCP project ID.
         dataset_id (str): The BigQuery dataset ID.
         table_id (str): The BigQuery table ID.
