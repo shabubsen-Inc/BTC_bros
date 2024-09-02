@@ -18,10 +18,12 @@ def get_all_data_from_bigquery(
         List[Dict]: A list of dictionaries where each dictionary represents a row of data,
                     with each row parsed from the 'raw_data' JSON string in the table.
     """
-    query = f"""
+    query = """
     SELECT *
-    FROM `{client.project}.{dataset_id}.{table_id}`
-    """
+    FROM `{}.{}.{}`
+    """.format(
+        client.project, dataset_id, table_id
+    )
 
     query_job = client.query(query)
 
