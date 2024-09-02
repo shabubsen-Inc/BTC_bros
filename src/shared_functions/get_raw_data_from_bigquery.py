@@ -18,12 +18,13 @@ def get_all_data_from_bigquery(
         List[Dict]: A list of dictionaries where each dictionary represents a row of data,
                     with each row parsed from the 'raw_data' JSON string in the table.
     """
+    # nosec B608 - The following query construction is safe in this context.
     query = """
     SELECT *
     FROM `{}`.`{}`.`{}`
     """.format(
         client.project, dataset_id, table_id
-    ) # nosec B608
+    )
 
     query_job = client.query(query)
 
