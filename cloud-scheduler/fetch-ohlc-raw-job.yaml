@@ -1,0 +1,39 @@
+name: Setup Cloud Scheduler for OHLC Raw Data Fetch
+
+on:
+  push:
+    branches:
+      - prod
+    paths:
+      - "cloud-scheduler/fetch-ohlc-raw-job.yaml"
+
+jobs:
+  setup-scheduler:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Create/Update Cloud Scheduler Job for OHLC Hourly Raw Data
+        run: |
+          gcloud scheduler jobs create http fetch-ohlc-raw-job \
+            --schedule="0 * * * *" \  # Every hour
+            --http-method=POST \
+            --uri=https://europe-west1-shabubsinc.cloudfunctions.net/ohlc-raw \
+            --time-zone="UTC" \
+            --oauth-service-account-email=cloud-scheduler-sa@shabubsinc.iam.gserviceaccount.com || \
+          gcloud scheduler jobs update http fetch-ohlc-raw-job \
+            --schedule="0 * * * *" \  # Every hour
+            --http-method=POST \
+            --uri=https://europe-west1-shabubsinc.cloudfunctions.net/ohlc-raw \
+            --time-zone="UTC"
