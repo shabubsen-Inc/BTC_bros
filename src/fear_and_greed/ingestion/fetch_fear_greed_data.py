@@ -1,4 +1,5 @@
 import requests
+import logging
 
 def fetch_fear_greed_data(api_uri: str) -> dict:
     try:
@@ -11,6 +12,6 @@ def fetch_fear_greed_data(api_uri: str) -> dict:
         return data
 
     except requests.exceptions.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")
+        logging.error(f"HTTP error occurred: {http_err}")
 
     return None
