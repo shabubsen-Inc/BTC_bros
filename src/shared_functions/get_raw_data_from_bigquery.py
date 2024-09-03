@@ -27,8 +27,7 @@ def get_raw_data_from_bigquery(
         FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
             )
             WHERE row_num = 1
-        """
-    # nosec
+        """  # nosec
 
     query_job = bigquery_client.query(query)
 

@@ -78,7 +78,7 @@ def filter_duplicates_fear_greed(
     FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
     """
     # nosec
-    
+
     query_job = bigquery_client.query(query)
     results = query_job.result()
 
