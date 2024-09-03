@@ -19,20 +19,19 @@ def ingest_fear_greed_clean():
         dataset_id="shabubsinc_db",
         table_id="clean_daily_fear_greed_data",
     )
+    structured_data = extract_required_fields(clean_data)
 
     clean_data = filter_duplicates(
         bigquery_client=bigquery_client,
         dataset_id="shabubsinc_db",
         table_id="clean_daily_fear_greed_data",
-        raw_data=fear_greed_raw_data
+        raw_data=structured_data
     )
-
-    structured_data = extract_required_fields(clean_data)
 
     try:
         stream_data_to_bigquery(
             bigquery_client=bigquery_client,
-            data=structured_data,
+            data=clean_data,
             project_id="shabubsinc",
             dataset_id="shabubsinc_db",
             table_id="clean_daily_fear_greed_data",
