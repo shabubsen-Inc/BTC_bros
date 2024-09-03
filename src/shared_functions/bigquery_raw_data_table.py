@@ -8,7 +8,12 @@ from google.cloud.exceptions import NotFound
 import pendulum
 
 
-def bigquery_raw_data_table(client: bigquery.Client, dataset_id: str, table_id: str, api_data: Union[List[Dict], Dict]) -> Optional[List[Dict]]:
+def bigquery_raw_data_table(
+    client: bigquery.Client,
+    dataset_id: str,
+    table_id: str,
+    api_data: Union[List[Dict], Dict],
+) -> Optional[List[Dict]]:
     """
     Ensures a BigQuery table exists with the desired schema and processes API data for insertion.
 
@@ -42,7 +47,7 @@ def bigquery_raw_data_table(client: bigquery.Client, dataset_id: str, table_id: 
     desired_schema = [
         SchemaField("data_modified", "TIMESTAMP", mode="REQUIRED"),
         SchemaField("metadata_time", "TIMESTAMP", mode="REQUIRED"),
-        SchemaField("raw_data", "STRING", mode="NULLABLE")
+        SchemaField("raw_data", "STRING", mode="NULLABLE"),
     ]
 
     dataset_ref = client.dataset(dataset_id)
@@ -51,22 +56,30 @@ def bigquery_raw_data_table(client: bigquery.Client, dataset_id: str, table_id: 
     try:
         # Check if the table already exists
         table = client.get_table(table_ref)
-        logging.info(f"Table {table.project}.{table.dataset_id}.{table.table_id} exists.")
+        logging.info(
+            f"Table {table.project}.{table.dataset_id}.{table.table_id} exists."
+        )
 
         # Check if the table has a schema
         if not table.schema:
             logging.info("Table exists but has no schema. Updating the table schema.")
             table.schema = desired_schema
             client.update_table(table, ["schema"])
-            logging.info(f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}")
+            logging.info(
+                f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}"
+            )
         else:
-            logging.info("Table already has a schema. No need to create or update the table.")
+            logging.info(
+                "Table already has a schema. No need to create or update the table."
+            )
 
     except NotFound:
         logging.info(f"Table does not exist. Creating table: {dataset_id}.{table_id}")
         table = bigquery.Table(table_ref, schema=desired_schema)
         table = client.create_table(table)
-        logging.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+        logging.info(
+            f"Created table {table.project}.{table.dataset_id}.{table.table_id}"
+        )
         time.sleep(5)
 
     # Get the current timestamp for when the API call was made
@@ -83,12 +96,12 @@ def bigquery_raw_data_table(client: bigquery.Client, dataset_id: str, table_id: 
             logging.error(f"An error occurred while processing API data: {e}")
     elif isinstance(api_data, dict) and api_data:
         # Handling the response when API data is a dictionary (e.g., from fear and greed index)
-        api_data = [item for item in api_data['data'] if isinstance(item, dict)]
+        api_data = [item for item in api_data["data"] if isinstance(item, dict)]
     else:
         logging.warning("API data is empty.")
 
     for data_point in api_data:
-        if 'time_period_start' in data_point:
+        if "time_period_start" in data_point:
             # Handling the coinapi response
             if isinstance(data_point, dict):
                 data_modified = data_point["time_period_start"]
@@ -96,13 +109,13 @@ def bigquery_raw_data_table(client: bigquery.Client, dataset_id: str, table_id: 
                 row = {
                     "data_modified": data_modified,
                     "metadata_time": metadata_time,
-                    "raw_data": raw_data
+                    "raw_data": raw_data,
                 }
                 rows_to_insert.append(row)
             else:
                 logging.info("Encountered a non-dictionary item in the list. Skipping.")
 
-        elif 'timestamp' in data_point:
+        elif "timestamp" in data_point:
             # Handling the fear and greed index response
             if isinstance(data_point, dict):
                 data_modified = data_point["timestamp"]
@@ -110,13 +123,15 @@ def bigquery_raw_data_table(client: bigquery.Client, dataset_id: str, table_id: 
                 row = {
                     "data_modified": data_modified,
                     "metadata_time": metadata_time,
-                    "raw_data": raw_data
+                    "raw_data": raw_data,
                 }
                 rows_to_insert.append(row)
             else:
                 logging.info("Encountered a non-dictionary item in the list. Skipping.")
         else:
-            logging.warning(f"Neither 'timestamp' nor 'time_period_start' found in data point: {data_point}. Skipping this item.")
+            logging.warning(
+                f"Neither 'timestamp' nor 'time_period_start' found in data point: {data_point}. Skipping this item."
+            )
 
     if rows_to_insert:
         return rows_to_insert

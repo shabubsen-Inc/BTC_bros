@@ -1,3 +1,3 @@
 from google.cloud import bigquery
 
-client = bigquery.Client(project='shabubsinc')
+client = bigquery.Client(project="shabubsinc")

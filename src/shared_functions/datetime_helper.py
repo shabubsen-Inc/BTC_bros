@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 def convert_datetime_to_string(data):
     """
     Recursively converts datetime objects in the data to ISO 8601 formatted strings.

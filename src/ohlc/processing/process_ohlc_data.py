@@ -6,7 +6,7 @@ import logging
 
 
 def ensure_bigquery_ohlc_table(client, dataset_id, table_id):
-    
+
     desired_schema = [
         SchemaField("time_period_start", "TIMESTAMP", mode="REQUIRED"),
         SchemaField("time_period_end", "TIMESTAMP", mode="REQUIRED"),
@@ -25,28 +25,40 @@ def ensure_bigquery_ohlc_table(client, dataset_id, table_id):
     try:
         # Check if the table already exists
         table = client.get_table(table_ref)
-        logging.info(f"Table {table.project}.{table.dataset_id}.{table.table_id} exists.")
-        
+        logging.info(
+            f"Table {table.project}.{table.dataset_id}.{table.table_id} exists."
+        )
+
         # Check if the table has a schema
         if not table.schema:
             logging.info("Table exists but has no schema. Updating the table schema.")
             table.schema = desired_schema
             client.update_table(table, ["schema"])
-            logging.info(f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}")
+            logging.info(
+                f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}"
+            )
         else:
-            logging.info("Table already has a schema. No need to create or update the table.")
-    
+            logging.info(
+                "Table already has a schema. No need to create or update the table."
+            )
+
     except NotFound:
-        
+
         try:
-            logging.info(f"Table does not exist. Creating table: {dataset_id}.{table_id}")
+            logging.info(
+                f"Table does not exist. Creating table: {dataset_id}.{table_id}"
+            )
             table = bigquery.Table(table_ref, schema=desired_schema)
             table = client.create_table(table)
-            logging.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+            logging.info(
+                f"Created table {table.project}.{table.dataset_id}.{table.table_id}"
+            )
             time.sleep(10)
 
         except NotFound as e:
-            logging.error(f"Failed to create table because the dataset or table was not found: {e}")
+            logging.error(
+                f"Failed to create table because the dataset or table was not found: {e}"
+            )
         except GoogleCloudError as e:
             logging.error(f"Google Cloud error occurred: {e}")
         except Exception as e:
