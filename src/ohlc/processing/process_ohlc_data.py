@@ -1,7 +1,6 @@
 from google.cloud import bigquery
 from google.cloud.bigquery import SchemaField
 from google.api_core.exceptions import NotFound
-import time
 import logging
 
 
