@@ -32,9 +32,8 @@ def filter_duplicates_ohlc(
     query = f"""
     SELECT time_period_start
     FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
-    """
-    # nosec
-
+    """# nosec
+    
     query_job = bigquery_client.query(query)
     results = query_job.result()
 
@@ -72,13 +71,13 @@ def filter_duplicates_fear_greed(
     raw_data: List[Dict],
 ) -> List[Dict]:
     raw_data = convert_unix_timestamp_in_data(raw_data)
+
     # nosec
-    query = f"""
+    query = f""" 
     SELECT timestamp
     FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
-    """
-    # nosec
-
+    """# nosec
+    
     query_job = bigquery_client.query(query)
     results = query_job.result()
 
