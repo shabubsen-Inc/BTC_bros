@@ -7,9 +7,8 @@ from google.cloud.bigquery import SchemaField
 from google.cloud.exceptions import NotFound
 import pendulum
 
-
 def bigquery_raw_data_table(
-    client: bigquery.Client,
+    bigquery_client: bigquery.Client,
     dataset_id: str,
     table_id: str,
     api_data: Union[List[Dict], Dict],
@@ -50,12 +49,12 @@ def bigquery_raw_data_table(
         SchemaField("raw_data", "STRING", mode="NULLABLE"),
     ]
 
-    dataset_ref = client.dataset(dataset_id)
+    dataset_ref = bigquery_client.dataset(dataset_id)
     table_ref = dataset_ref.table(table_id)
 
     try:
         # Check if the table already exists
-        table = client.get_table(table_ref)
+        table = bigquery_client.get_table(table_ref)
         logging.info(
             f"Table {table.project}.{table.dataset_id}.{table.table_id} exists."
         )
@@ -64,7 +63,7 @@ def bigquery_raw_data_table(
         if not table.schema:
             logging.info("Table exists but has no schema. Updating the table schema.")
             table.schema = desired_schema
-            client.update_table(table, ["schema"])
+            bigquery_client.update_table(table, ["schema"])
             logging.info(
                 f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}"
             )
@@ -76,7 +75,7 @@ def bigquery_raw_data_table(
     except NotFound:
         logging.info(f"Table does not exist. Creating table: {dataset_id}.{table_id}")
         table = bigquery.Table(table_ref, schema=desired_schema)
-        table = client.create_table(table)
+        table = bigquery_client.create_table(table)
         logging.info(
             f"Created table {table.project}.{table.dataset_id}.{table.table_id}"
         )

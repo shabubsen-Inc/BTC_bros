@@ -3,8 +3,8 @@ from typing import List, Dict
 from google.cloud import bigquery
 
 
-def get_all_data_from_bigquery(
-    client: bigquery.Client, dataset_id: str, table_id: str
+def get_raw_data_from_bigquery(
+    bigquery_client: bigquery.Client, dataset_id: str, table_id: str
 ) -> List[Dict]:
     """
     Retrieves all data from a specified table in BigQuery as a list of dictionaries.
@@ -18,13 +18,18 @@ def get_all_data_from_bigquery(
         List[Dict]: A list of dictionaries where each dictionary represents a row of data,
                     with each row parsed from the 'raw_data' JSON string in the table.
     """
-    # nosec
+   
     query = f"""
     SELECT *
-    FROM `{client.project}.{dataset_id}.{table_id}`
-    """  # nosec
+    FROM (
+        SELECT *,
+               ROW_NUMBER() OVER (PARTITION BY data_modified ORDER BY metadata_time DESC) as row_num
+        FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
+            )
+            WHERE row_num = 1
+        """
 
-    query_job = client.query(query)
+    query_job = bigquery_client.query(query)
 
     results = query_job.result()
 

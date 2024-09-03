@@ -1,9 +1,5 @@
-from storage.fetch_data_from_db import get_all_data_from_bigquery
-from shared_functions import stream_data_to_bigquery, bigquery_client
-from fear_and_greed.processing.process_fear_greed_data import (
-    ensure_bigquery_fear_greed_table,
-    extract_required_fields,
-)
+from shared_functions import stream_data_to_bigquery, bigquery_client, get_raw_data_from_bigquery, filter_duplicates
+from fear_and_greed.processing.process_fear_greed_data import ensure_bigquery_fear_greed_table, extract_required_fields
 from fastapi import FastAPI, HTTPException
 import logging
 
@@ -13,7 +9,7 @@ app = FastAPI()
 @app.post("/ingest/fear-greed/clean")
 def ingest_fear_greed_clean():
 
-    fear_greed_raw_data = get_all_data_from_bigquery(
+    fear_greed_raw_data = get_raw_data_from_bigquery(
         bigquery_client=bigquery_client,
         dataset_id="shabubsinc_db",
         table_id="raw_daily_fear_greed_data",
@@ -24,7 +20,14 @@ def ingest_fear_greed_clean():
         table_id="clean_daily_fear_greed_data",
     )
 
-    structured_data = extract_required_fields(fear_greed_raw_data)
+    clean_data = filter_duplicates(
+        bigquery_client=bigquery_client,
+        dataset_id="shabubsinc_db",
+        table_id="clean_daily_fear_greed_data",
+        raw_data=fear_greed_raw_data
+    )
+
+    structured_data = extract_required_fields(clean_data)
 
     try:
         stream_data_to_bigquery(
