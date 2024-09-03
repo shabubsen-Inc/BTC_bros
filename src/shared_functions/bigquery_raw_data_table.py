@@ -7,6 +7,7 @@ from google.cloud.bigquery import SchemaField
 from google.cloud.exceptions import NotFound
 import pendulum
 
+
 def bigquery_raw_data_table(
     bigquery_client: bigquery.Client,
     dataset_id: str,

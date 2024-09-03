@@ -4,7 +4,9 @@ from google.api_core.exceptions import NotFound
 import logging
 
 
-def ensure_bigquery_ohlc_table(bigquery_client: bigquery.Client, dataset_id:str, table_id:str):
+def ensure_bigquery_ohlc_table(
+    bigquery_client: bigquery.Client, dataset_id: str, table_id: str
+):
 
     desired_schema = [
         SchemaField("time_period_start", "TIMESTAMP", mode="REQUIRED"),
@@ -55,8 +57,7 @@ def ensure_bigquery_ohlc_table(bigquery_client: bigquery.Client, dataset_id:str,
             logging.info(
                 f"Created table {table.project}.{table.dataset_id}.{table.table_id}"
             )
-            print('created a new table')
-            
+            print("created a new table")
 
         except NotFound as e:
             print(5)

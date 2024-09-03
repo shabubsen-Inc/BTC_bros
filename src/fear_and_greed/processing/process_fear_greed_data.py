@@ -4,7 +4,9 @@ import time
 import logging
 
 
-def ensure_bigquery_fear_greed_table(bigquery_client: bigquery.Client, dataset_id:str, table_id:str):
+def ensure_bigquery_fear_greed_table(
+    bigquery_client: bigquery.Client, dataset_id: str, table_id: str
+):
     # Defining schema to use for Fear and Greed Index data
     desired_schema = [
         bigquery.SchemaField("value", "STRING", mode="REQUIRED"),

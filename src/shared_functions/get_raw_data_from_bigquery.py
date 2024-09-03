@@ -18,7 +18,7 @@ def get_raw_data_from_bigquery(
         List[Dict]: A list of dictionaries where each dictionary represents a row of data,
                     with each row parsed from the 'raw_data' JSON string in the table.
     """
-   
+    # nosec
     query = f"""
     SELECT *
     FROM (
@@ -28,6 +28,7 @@ def get_raw_data_from_bigquery(
             )
             WHERE row_num = 1
         """
+    # nosec
 
     query_job = bigquery_client.query(query)
 

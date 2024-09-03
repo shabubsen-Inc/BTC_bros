@@ -13,7 +13,9 @@ start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%S")
 end_date = datetime.strptime(end_date_str, "%Y-%m-%dT%H:%M:%S")
 
 
-def API_call_limiter(call_count:int, max_calls_per_minute:int, call_interval:int)->int:
+def API_call_limiter(
+    call_count: int, max_calls_per_minute: int, call_interval: int
+) -> int:
     """
     Rate limiter to ensure the API calls do not exceed the allowed limit.
 

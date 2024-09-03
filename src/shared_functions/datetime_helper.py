@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
-def convert_unix_timestamp_in_data(data:dict)->dict:
+
+def convert_unix_timestamp_in_data(data: dict) -> dict:
     """
     Converts Unix timestamps in the 'timestamp' fields to a formatted string 'YYYY-MM-DD HH:MM:SS UTC'.
 
@@ -12,17 +13,21 @@ def convert_unix_timestamp_in_data(data:dict)->dict:
     """
     if isinstance(data, dict):
         for key, value in data.items():
-            if key == "timestamp" and isinstance(value, str):  # Convert only if the key is 'timestamp'
+            if key == "timestamp" and isinstance(
+                value, str
+            ):  # Convert only if the key is 'timestamp'
                 try:
                     unix_timestamp = int(value)
-                    data[key] = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+                    data[key] = datetime.fromtimestamp(
+                        unix_timestamp, tz=timezone.utc
+                    ).strftime("%Y-%m-%d %H:%M:%S UTC")
                 except ValueError:
                     continue  # If the conversion fails, skip this field
             else:
                 data[key] = convert_unix_timestamp_in_data(value)
     elif isinstance(data, list):
         return [convert_unix_timestamp_in_data(item) for item in data]
-    
+
     return data
 
 

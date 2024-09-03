@@ -1,5 +1,13 @@
-from shared_functions import stream_data_to_bigquery, bigquery_client, get_raw_data_from_bigquery, filter_duplicates_fear_greed
-from fear_and_greed.processing.process_fear_greed_data import ensure_bigquery_fear_greed_table, extract_required_fields
+from shared_functions import (
+    stream_data_to_bigquery,
+    bigquery_client,
+    get_raw_data_from_bigquery,
+    filter_duplicates_fear_greed,
+)
+from fear_and_greed.processing.process_fear_greed_data import (
+    ensure_bigquery_fear_greed_table,
+    extract_required_fields,
+)
 from fastapi import FastAPI, HTTPException
 import logging
 
@@ -25,7 +33,7 @@ def ingest_fear_greed_clean():
         bigquery_client=bigquery_client,
         dataset_id="shabubsinc_db",
         table_id="clean_daily_fear_greed_data",
-        raw_data=structured_data
+        raw_data=structured_data,
     )
 
     try:

@@ -34,8 +34,8 @@ def stream_data_to_bigquery(
     if not all(isinstance(item, dict) for item in data):
         logging.info("Error: All items in the data must be dictionaries.")
         return
-   
-    #print(f'{data} test')
+
+    # print(f'{data} test')
     # Stream data to BigQuery
     errors = bigquery_client.insert_rows_json(table=table, json_rows=data)
     if errors:

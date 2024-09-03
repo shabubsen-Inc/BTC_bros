@@ -1,6 +1,10 @@
 from google.cloud import pubsub_v1
 from fear_and_greed.ingestion.fetch_fear_greed_data import fetch_fear_greed_data
-from shared_functions import bigquery_raw_data_table, stream_data_to_bigquery, bigquery_client
+from shared_functions import (
+    bigquery_raw_data_table,
+    stream_data_to_bigquery,
+    bigquery_client,
+)
 from fastapi import FastAPI, HTTPException
 import logging
 
