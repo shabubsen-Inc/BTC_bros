@@ -1,0 +1,83 @@
+.
+├── README.md
+├── build
+│   ├── bdist.linux-x86_64
+│   └── lib
+│       ├── fear_and_greed
+│       │   ├── __init__.py
+│       │   ├── ingestion
+│       │   │   ├── __init__.py
+│       │   │   ├── fetch_fear_greed_data.py
+│       │   │   └── main.py
+│       │   └── processing
+│       │       ├── __init__.py
+│       │       ├── main.py
+│       │       └── process_fear_greed_data.py
+│       ├── ohlc
+│       │   ├── __init__.py
+│       │   ├── ingestion
+│       │   │   ├── __init__.py
+│       │   │   ├── fetch_ohlc_hourly_data.py
+│       │   │   └── main.py
+│       │   └── processing
+│       │       ├── __init__.py
+│       │       ├── main.py
+│       │       └── process_ohlc_data.py
+│       └── shared_functions
+│           ├── __init__.py
+│           ├── bigquery_client.py
+│           ├── bigquery_raw_data_table.py
+│           ├── datetime_helper.py
+│           ├── get_raw_data_from_bigquery.py
+│           └── stream_data_to_bigquery.py
+├── cloud-scheduler
+│   ├── clean-fear-and-greed-job.yaml
+│   ├── clean-ohlc-job.yaml
+│   ├── fetch-fear-and-greed-raw-job.yaml
+│   └── fetch-ohlc-raw-job.yaml
+├── dist
+│   ├── shared_functions-0.1-py3-none-any.whl
+│   └── shared_functions-0.1.tar.gz
+├── setup.py
+├── src
+│   ├── __init__.py
+│   ├── config.py
+│   ├── fear_and_greed
+│   │   ├── __init__.py
+│   │   ├── ingestion
+│   │   │   ├── __init__.py
+│   │   │   ├── fetch_fear_greed_data.py
+│   │   │   └── main.py
+│   │   └── processing
+│   │       ├── __init__.py
+│   │       ├── main.py
+│   │       └── process_fear_greed_data.py
+│   ├── ohlc
+│   │   ├── __init__.py
+│   │   ├── ingestion
+│   │   │   ├── __init__.py
+│   │   │   ├── fetch_ohlc_hourly_data.py
+│   │   │   ├── main.py
+│   │   │   └── requirements.txt
+│   │   └── processing
+│   │       ├── __init__.py
+│   │       ├── main.py
+│   │       ├── process_ohlc_data.py
+│   │       ├── requirements.txt
+│   │       └── test.py
+│   ├── shared_functions
+│   │   ├── __init__.py
+│   │   ├── bigquery_client.py
+│   │   ├── bigquery_raw_data_table.py
+│   │   ├── datetime_helper.py
+│   │   ├── get_raw_data_from_bigquery.py
+│   │   └── stream_data_to_bigquery.py
+│   └── shared_functions.egg-info
+│       ├── PKG-INFO
+│       ├── SOURCES.txt
+│       ├── dependency_links.txt
+│       ├── requires.txt
+│       └── top_level.txt
+└── structure.txt
+
+21 directories, 59 files
