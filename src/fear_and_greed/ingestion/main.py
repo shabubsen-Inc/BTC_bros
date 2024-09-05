@@ -1,3 +1,4 @@
+import json
 from google.cloud import pubsub_v1
 from fear_and_greed.ingestion.fetch_fear_greed_data import fetch_fear_greed_data
 from shared_functions import (
@@ -34,7 +35,18 @@ def ingest_fear_greed_raw():
             dataset_id="shabubsinc_db",
             table_id="raw_daily_fear_greed_data",
         )
-        publisher.publish(topic_path, b"Trigger clean processing for Fear & Greed")
+
+        message = json.dumps({
+            "status": "completed",
+            "source": "fear_greed_raw",
+            "table": "raw_daily_fear_greed_data"
+        }).encode("utf-8")
+
+        publisher.publish(topic_path, message)
+        publisher.result()
+
+        logging.info("Published message to trigger fear and greed clean.")
+
         return {"status": "success"}
 
     except Exception as e:

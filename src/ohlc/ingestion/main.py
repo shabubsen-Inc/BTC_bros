@@ -1,3 +1,4 @@
+import json
 from google.cloud import pubsub_v1
 from ingestion.fetch_ohlc_hourly_data import (
     fetch_ohlc_data_from_api,
@@ -42,7 +43,16 @@ def ingest_ohlc_raw():
             table_id="raw_hourly_ohlc_data",
         )
 
-        publisher.publish(topic_path, b"Trigger clean processing for ohlc")
+        message = json.dumps({
+            "status": "completed",
+            "source": "ohlc_raw",
+            "table": "raw_hourly_ohlc_data"
+        }).encode("utf-8")
+
+        publisher.publish(topic_path, message)
+        publisher.result()
+
+        logging.info("Published message to trigger ohlc clean.")
 
         return {"status": "success"}
 
