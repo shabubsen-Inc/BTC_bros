@@ -1,11 +1,10 @@
 import logging
 from typing import List, Dict, Union
 from google.cloud import bigquery
-from shared_functions.datetime_helper import convert_datetime_to_string
 
 
 def stream_data_to_bigquery(
-    client: bigquery.Client,
+    bigquery_client: bigquery.Client,
     data: Union[List[Dict], List[List[Dict]]],
     project_id: str,
     dataset_id: str,
@@ -36,11 +35,9 @@ def stream_data_to_bigquery(
         logging.info("Error: All items in the data must be dictionaries.")
         return
 
-    # Convert datetime objects to strings
-    data = convert_datetime_to_string(data)
-
+    # print(f'{data} test')
     # Stream data to BigQuery
-    errors = client.insert_rows_json(table=table, json_rows=data)
+    errors = bigquery_client.insert_rows_json(table=table, json_rows=data)
     if errors:
         logging.info("Encountered errors while inserting rows:")
         for error in errors:

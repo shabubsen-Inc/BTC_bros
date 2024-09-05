@@ -1,10 +1,12 @@
 from google.cloud import bigquery
-from google.api_core.exceptions import NotFound, GoogleCloudError
+from google.api_core.exceptions import NotFound
 import time
 import logging
 
 
-def ensure_bigquery_fear_greed_table(client, dataset_id, table_id):
+def ensure_bigquery_fear_greed_table(
+    bigquery_client: bigquery.Client, dataset_id: str, table_id: str
+):
     # Defining schema to use for Fear and Greed Index data
     desired_schema = [
         bigquery.SchemaField("value", "STRING", mode="REQUIRED"),
@@ -12,12 +14,12 @@ def ensure_bigquery_fear_greed_table(client, dataset_id, table_id):
         bigquery.SchemaField("timestamp", "TIMESTAMP", mode="REQUIRED"),
     ]
 
-    dataset_ref = client.dataset(dataset_id)
+    dataset_ref = bigquery_client.dataset(dataset_id)
     table_ref = dataset_ref.table(table_id)
 
     try:
         # Check if the table already exists
-        table = client.get_table(table_ref)
+        table = bigquery_client.get_table(table_ref)
         logging.info(
             f"Table {table.project}.{table.dataset_id}.{table.table_id} exists."
         )
@@ -26,7 +28,7 @@ def ensure_bigquery_fear_greed_table(client, dataset_id, table_id):
         if not table.schema:
             logging.info("Table exists but has no schema. Updating the table schema.")
             table.schema = desired_schema
-            client.update_table(table, ["schema"])
+            bigquery_client.update_table(table, ["schema"])
             logging.info(
                 f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}"
             )
@@ -42,18 +44,16 @@ def ensure_bigquery_fear_greed_table(client, dataset_id, table_id):
                 f"Table does not exist. Creating table: {dataset_id}.{table_id}"
             )
             table = bigquery.Table(table_ref, schema=desired_schema)
-            table = client.create_table(table)
+            table = bigquery_client.create_table(table)
             logging.info(
                 f"Created table {table.project}.{table.dataset_id}.{table.table_id}"
             )
-            time.sleep(10)
+            time.sleep(30)
 
         except NotFound as e:
             logging.error(
                 f"Failed to create table because the dataset or table was not found: {e}"
             )
-        except GoogleCloudError as e:
-            logging.error(f"Google Cloud error occurred: {e}")
         except Exception as e:
             logging.error(f"An unexpected error occurred: {e}")
 
