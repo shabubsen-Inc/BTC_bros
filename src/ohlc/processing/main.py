@@ -1,3 +1,4 @@
+import json
 from shared_functions import (
     stream_data_to_bigquery,
     bigquery_client,
@@ -5,12 +6,15 @@ from shared_functions import (
     filter_duplicates_ohlc,
 )
 from ohlc.processing.process_ohlc_data import ensure_bigquery_ohlc_table
+from google.cloud import pubsub_v1
 import logging
 from fastapi import FastAPI, HTTPException
 
 
 app = FastAPI()
 
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path("shabubsinc","trigger-consume")
 
 @app.post("/ingest/ohlc/clean")
 def ingest_ohlc_clean():
@@ -40,6 +44,17 @@ def ingest_ohlc_clean():
             dataset_id="shabubsinc_db",
             table_id="clean_hourly_ohlc_data",
         )
+
+        message = json.dumps({
+            "status": "completed",
+            "source": "ohlc_clean",
+            "table": "clean_hourly_ohlc_data"
+        }).encode("utf-8")
+        
+        publisher.publish(topic_path, message)
+        logging.info("Published message to trigger consumption process.")
+
+
         return {"status": "success"}
 
     except Exception as e:
