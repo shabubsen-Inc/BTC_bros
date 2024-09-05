@@ -1,4 +1,3 @@
-import json
 from shared_functions import (
     stream_data_to_bigquery,
     bigquery_client,
@@ -9,14 +8,10 @@ from fear_and_greed.processing.process_fear_greed_data import (
     ensure_bigquery_fear_greed_table,
     extract_required_fields,
 )
-from google.cloud import pubsub_v1
 from fastapi import FastAPI, HTTPException
 import logging
 
 app = FastAPI()
-
-publisher = pubsub_v1.PublisherClient()
-topic_path = publisher.topic_path("shabubsinc","trigger-consume")
 
 
 @app.post("/ingest/fear-greed/clean")
@@ -49,16 +44,6 @@ def ingest_fear_greed_clean():
             dataset_id="shabubsinc_db",
             table_id="clean_daily_fear_greed_data",
         )
-
-        message = json.dumps({
-            "status": "completed",
-            "source": "fear_greed_clean",
-            "table": "clean_daily_fear_greed_data"
-        }).encode("utf-8")
-        
-        publisher.publish(topic_path, message)
-        logging.info("Published message to trigger consumption process.")
-
         return {"status": "success"}
 
     except Exception as e:
