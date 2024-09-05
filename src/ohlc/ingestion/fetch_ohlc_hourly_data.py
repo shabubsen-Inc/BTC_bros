@@ -13,7 +13,9 @@ start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%S")
 end_date = datetime.strptime(end_date_str, "%Y-%m-%dT%H:%M:%S")
 
 
-def API_call_limiter(call_count, max_calls_per_minute, call_interval):
+def API_call_limiter(
+    call_count: int, max_calls_per_minute: int, call_interval: int
+) -> int:
     """
     Rate limiter to ensure the API calls do not exceed the allowed limit.
 
@@ -39,9 +41,9 @@ def API_call_limiter(call_count, max_calls_per_minute, call_interval):
 
 def access_secret_version(project_id: str, secret_id: str, version_id="latest"):
     """this function fetches keys from google secret manager"""
-    client = secretmanager.SecretManagerServiceClient()
+    secret_manager_client = secretmanager.SecretManagerServiceClient()
     name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
-    response = client.access_secret_version(request={"name": name})
+    response = secret_manager_client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")
 
 
