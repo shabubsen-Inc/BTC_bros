@@ -36,16 +36,18 @@ def ingest_fear_greed_raw():
             table_id="raw_daily_fear_greed_data",
         )
 
-        message = json.dumps({
-            "status": "completed",
-            "source": "fear_greed_raw",
-            "table": "raw_daily_fear_greed_data"
-        }).encode("utf-8")
+        message = json.dumps(
+            {
+                "status": "completed",
+                "source": "fear_greed_raw",
+                "table": "raw_daily_fear_greed_data",
+            }
+        ).encode("utf-8")
 
         publisher.publish(topic_path, message)
         publisher.result()
 
-        logging.info("Published message to trigger fear and greed clean.")
+        logging.info("Published message to trigger Fear & Greed clean.")
 
         return {"status": "success"}
 

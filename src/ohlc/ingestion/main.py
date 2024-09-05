@@ -43,16 +43,18 @@ def ingest_ohlc_raw():
             table_id="raw_hourly_ohlc_data",
         )
 
-        message = json.dumps({
-            "status": "completed",
-            "source": "ohlc_raw",
-            "table": "raw_hourly_ohlc_data"
-        }).encode("utf-8")
+        message = json.dumps(
+            {
+                "status": "completed",
+                "source": "ohlc_raw",
+                "table": "raw_hourly_ohlc_data",
+            }
+        ).encode("utf-8")
 
         publisher.publish(topic_path, message)
         publisher.result()
 
-        logging.info("Published message to trigger ohlc clean.")
+        logging.info("Published message to trigger OHLC clean.")
 
         return {"status": "success"}
 
