@@ -52,8 +52,8 @@ def ingest_fear_greed_clean():
         
         message = json.dumps({
             "status": "completed",
-            "source": "ohlc_clean",
-            "table": "clean_hourly_ohlc_data"
+            "source": "fear_greed_clean",
+            "table": "clean_daily_fear_greed_data"
         }).encode("utf-8")
         
         publisher.publish(topic_path, message)
