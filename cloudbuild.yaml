@@ -1,0 +1,124 @@
+steps:
+  # Step 1: Retrieve the Cloud Run Service Account Key from Secret Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud secrets versions access latest --secret="cloud-run-secret" > /workspace/cloud-run-sa-key.json
+        export GOOGLE_APPLICATION_CREDENTIALS=/workspace/cloud-run-sa-key.json
+        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+        gcloud config set project ${_PROJECT_ID}
+
+  # Step 2: Retrieve the BigQuery Service Account Key from Secret Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud secrets versions access latest --secret="bigquery_sa" > /workspace/bigquery-sa-key.json
+
+  # Step 3: Retrieve the CoinAPI Key from Secret Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud secrets versions access latest --secret="coinapi-key" > /workspace/coinapi-key.txt
+
+  # Step 4: Build and Push Docker images for OHLC Ingestion Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/${_PROJECT_ID}/ohlc-ingestion-service', 
+      './src/ohlc/ingestion'
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/${_PROJECT_ID}/ohlc-ingestion-service']
+
+  # Step 5: Deploy OHLC Ingestion Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'ohlc-ingestion-service',
+      '--image', 'gcr.io/${_PROJECT_ID}/ohlc-ingestion-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@${_PROJECT_ID}.iam.gserviceaccount.com'
+    ]
+
+  # Step 6: Build and Push Docker images for OHLC Processing Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/${_PROJECT_ID}/ohlc-processing-service', 
+      './src/ohlc/processing'
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/${_PROJECT_ID}/ohlc-processing-service']
+
+  # Step 7: Deploy OHLC Processing Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'ohlc-processing-service',
+      '--image', 'gcr.io/${_PROJECT_ID}/ohlc-processing-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@${_PROJECT_ID}.iam.gserviceaccount.com'
+    ]
+
+  # Step 8: Build and Push Docker images for Fear & Greed Ingestion Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/${_PROJECT_ID}/fear-greed-ingestion-service', 
+      './src/fear_and_greed/ingestion'
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/${_PROJECT_ID}/fear-greed-ingestion-service']
+
+  # Step 9: Deploy Fear & Greed Ingestion Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'fear-greed-ingestion-service',
+      '--image', 'gcr.io/${_PROJECT_ID}/fear-greed-ingestion-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@${_PROJECT_ID}.iam.gserviceaccount.com'
+    ]
+
+  # Step 10: Build and Push Docker images for Fear & Greed Processing Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/${_PROJECT_ID}/fear-greed-processing-service', 
+      './src/fear_and_greed/processing'
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/${_PROJECT_ID}/fear-greed-processing-service']
+
+  # Step 11: Deploy Fear & Greed Processing Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'fear-greed-processing-service',
+      '--image', 'gcr.io/${_PROJECT_ID}/fear-greed-processing-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@${_PROJECT_ID}.iam.gserviceaccount.com'
+    ]
+
+substitutions:
+  _PROJECT_ID: "shabubsinc"
+
+images:
+  - 'gcr.io/${_PROJECT_ID}/ohlc-ingestion-service'
+  - 'gcr.io/${_PROJECT_ID}/ohlc-processing-service'
+  - 'gcr.io/${_PROJECT_ID}/fear-greed-ingestion-service'
+  - 'gcr.io/${_PROJECT_ID}/fear-greed-processing-service'

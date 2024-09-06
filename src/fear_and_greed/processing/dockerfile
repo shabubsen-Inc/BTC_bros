@@ -1,0 +1,23 @@
+# Use an official Python runtime as a base image
+FROM python:3.10-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file to the container
+COPY requirements.txt .
+
+# Install dependencies from requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the shared_functions package from dist/ into the container
+COPY ../../../../dist/shared_functions-0.1.tar.gz /app/shared_functions-0.1.tar.gz
+
+# Install shared_functions from the tar.gz
+RUN pip install /app/shared_functions-0.1.tar.gz
+
+# Copy the rest of the Fear & Greed processing code
+COPY . .
+
+# Command to run the Fear & Greed processing service
+CMD ["python", "main.py"]
