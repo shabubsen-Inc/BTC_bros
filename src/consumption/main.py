@@ -1,30 +1,22 @@
 import json
 from fastapi import FastAPI, HTTPException
-from starlette.requests import Request
+from shared_functions import bigquery_client
 import logging
+
+from src.shared_functions import create_or_refresh_materialized_view
 
 app = FastAPI()
 
 @app.post("/consume")
-async def consume(request: Request):
+async def consume():
     try:
-        request_body = await request.json()
-        message_data = json.loads(request_body['message']['data'])
+    
+        logging.info(f"Triggered consumption to refresh materialized view.")
 
-        source = message_data.get("source")
+        create_or_refresh_materialized_view(bigquery_client,"shabubsinc","shabubsinc_db","mview_consume")
+        logging.info("Materialized view successfully created or refreshed.")
 
-        if source in ["ohlc_clean", "fear_greed_clean"]:
-            logging.info(f"Triggered consumption from source: {source}")
-
-        #![TODO]
-        # Logic:
-        #  use sql to combine the tables
-        #![TODO]
-
-
-        else:
-            logging.warning("Message source not relevant for consumption.")
-            return {"status": "ignored"}
+        return {"status": "success", "message": "Materialized view created/refreshed."}
 
     except Exception as e:
         logging.error(f"Error during consumption process: {e}")
