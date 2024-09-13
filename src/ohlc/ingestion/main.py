@@ -7,7 +7,9 @@ from shared_functions import (
     bigquery_raw_data_table,
     stream_data_to_bigquery,
 )
-from shared_functions.logger_setup import setup_logger  # Importing the custom logger setup
+from shared_functions.logger_setup import (
+    setup_logger,
+)  # Importing the custom logger setup
 from google.cloud.workflows.executions_v1 import ExecutionsClient
 from fastapi import FastAPI, HTTPException
 import uvicorn  # Importing uvicorn
@@ -31,11 +33,12 @@ app = FastAPI()
 # Initialize the Workflows Execution client
 executions_client = ExecutionsClient()
 
+
 @app.post("/")
 def ingest_ohlc_raw():
     try:
         logger.info("Starting data ingestion process...")
-        
+
         # Fetch OHLC data from the API
         ohlc_data = fetch_ohlc_data_from_api(headers)
         if not ohlc_data:
@@ -52,7 +55,9 @@ def ingest_ohlc_raw():
         )
         if not raw_ohlc_data:
             logger.error("Raw OHLC data preparation failed.")
-            raise HTTPException(status_code=500, detail="Failed to prepare raw OHLC data")
+            raise HTTPException(
+                status_code=500, detail="Failed to prepare raw OHLC data"
+            )
         logger.info("Prepared raw OHLC data for BigQuery")
 
         # Stream data to BigQuery
@@ -66,13 +71,13 @@ def ingest_ohlc_raw():
         logger.info("Data streamed to BigQuery successfully")
 
         # Trigger the Cloud Workflow for processing after ingestion
-        #execution = Execution(argument="{}")
-        #parent = f"projects/{project_id}/locations/{region}/workflows/{processing_workflow_name}"
-        
-        #try:
+        # execution = Execution(argument="{}")
+        # parent = f"projects/{project_id}/locations/{region}/workflows/{processing_workflow_name}"
+
+        # try:
         #    #response = executions_client.create_execution(parent=parent, execution=execution)
         #    logger.info(f"Processing workflow triggered: {response.name}")
-        #except Exception as e:
+        # except Exception as e:
         #    logger.exception(f"Failed to trigger processing workflow: {e}")
         #    raise HTTPException(status_code=500, detail=f"Failed to trigger processing workflow: {str(e)}")
 
@@ -81,7 +86,9 @@ def ingest_ohlc_raw():
 
     except Exception as e:
         logger.exception(f"Failed to process OHLC data: {e}")
-        raise HTTPException(status_code=500, detail=f"Data ingestion and processing failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Data ingestion and processing failed: {str(e)}"
+        )
 
 
 # Ensure FastAPI runs with Uvicorn in Cloud Run

@@ -26,7 +26,7 @@ def ingest_ohlc_clean():
         dataset_id="shabubsinc_db",
         table_id="clean_hourly_ohlc_data",
     )
-    
+
     clean_data = filter_duplicates_ohlc(
         bigquery_client=bigquery_client,
         dataset_id="shabubsinc_db",

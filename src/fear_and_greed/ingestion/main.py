@@ -17,6 +17,7 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @app.post("/")
 def ingest_fear_greed_raw():
     try:

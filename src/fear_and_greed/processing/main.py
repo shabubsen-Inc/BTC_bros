@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+
 @app.post("/")
 def ingest_fear_greed_clean():
     try:

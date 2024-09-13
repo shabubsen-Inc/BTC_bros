@@ -38,7 +38,9 @@ def filter_duplicates_ohlc(
     results = query_job.result()
 
     # Create a set of existing timestamps for efficient lookup
-    existing_data_modified = {row["time_period_start"].strftime("%Y-%m-%d %H:%M:%S UTC") for row in results}
+    existing_data_modified = {
+        row["time_period_start"].strftime("%Y-%m-%d %H:%M:%S UTC") for row in results
+    }
 
     new_data = []
     for row in raw_data:
@@ -46,7 +48,9 @@ def filter_duplicates_ohlc(
         if data_modified:
             try:
                 # Parse the timestamp while handling microseconds
-                formatted_date = datetime.strptime(data_modified, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d %H:%M:%S UTC")
+                formatted_date = datetime.strptime(
+                    data_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
+                ).strftime("%Y-%m-%d %H:%M:%S UTC")
             except ValueError as e:
                 logging.info(f"Failed to parse {data_modified}: {e}")
                 continue  # Skip to the next iteration if parsing fails
@@ -63,7 +67,6 @@ def filter_duplicates_ohlc(
         return []
 
     return new_data
-
 
 
 def filter_duplicates_fear_greed(

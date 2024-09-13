@@ -2,15 +2,18 @@
 
 from google.cloud import secretmanager
 
-def access_secret_version(secret_id: str, project_id: str = "shabubsinc", version_id: str = "latest") -> str:
+
+def access_secret_version(
+    secret_id: str, project_id: str = "shabubsinc", version_id: str = "latest"
+) -> str:
     """
     Access the payload for the given secret version.
-    
+
     Args:
         secret_id (str): The ID of the secret in Secret Manager.
         project_id (str): The Google Cloud Project ID where the secret is stored.
         version_id (str): The version of the secret to access. Defaults to "latest".
-    
+
     Returns:
         str: The secret payload as a string.
     """
