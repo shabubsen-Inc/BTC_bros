@@ -1,0 +1,57 @@
+main:
+  steps:
+    # Step 1: Assign the correct URLs for the ingestion and processing services
+    - init:
+        assign:
+          - ingestion_service_url: "https://fear-greed-ingestion-service-7x6gclrt6a-ew.a.run.app"
+          - clean_service_url: "https://fear-greed-processing-service-7x6gclrt6a-ew.a.run.app"
+
+    # Step 2: Trigger the Fear & Greed ingestion service
+    - trigger_fear_greed_ingestion:
+        call: http.post
+        args:
+          url: ${ingestion_service_url + "/"}
+          auth:
+            type: OIDC
+          body:
+            trigger: "start_ingestion"
+          headers:
+            Content-Type: "application/json"
+        result: fear_greed_ingestion_response
+
+    # Step 3: Check the ingestion response
+    - check_fear_greed_ingestion:
+        switch:
+          - condition: '${"status" in fear_greed_ingestion_response.body and fear_greed_ingestion_response.body.status == "success"}'
+            next: trigger_clean_service
+          - condition: '${"status" in fear_greed_ingestion_response.body and fear_greed_ingestion_response.body.status == "failure"}'
+            raise: "FearGreedIngestionFailed"
+          - condition: 'true'
+            raise: "UnexpectedIngestionResponse"
+
+    # Step 4: Trigger the Fear & Greed clean (processing) service
+    - trigger_clean_service:
+        call: http.post
+        args:
+          url: ${clean_service_url + "/"}
+          auth:
+            type: OIDC
+          body:
+            trigger: "start_processing"
+          headers:
+            Content-Type: "application/json"
+        result: fear_greed_clean_response
+
+    # Step 5: Check the clean response
+    - check_fear_greed_clean:
+        switch:
+          - condition: '${"status" in fear_greed_clean_response.body and fear_greed_clean_response.body.status == "success"}'
+            next: done
+          - condition: '${"status" in fear_greed_clean_response.body and fear_greed_clean_response.body.status == "failure"}'
+            raise: "FearGreedCleanFailed"
+          - condition: 'true'
+            raise: "UnexpectedCleanResponse"
+
+    # Step 6: Workflow completion
+    - done:
+        return: "Fear & Greed Ingestion and Processing completed successfully"
