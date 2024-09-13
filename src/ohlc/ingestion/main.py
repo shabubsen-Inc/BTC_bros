@@ -1,5 +1,4 @@
-from google.cloud import pubsub_v1
-from ingestion.fetch_ohlc_hourly_data import (
+from fetch_ohlc_hourly_data import (
     fetch_ohlc_data_from_api,
     access_secret_version,
 )
@@ -8,32 +7,60 @@ from shared_functions import (
     bigquery_raw_data_table,
     stream_data_to_bigquery,
 )
-import logging
+from shared_functions.logger_setup import (
+    setup_logger,
+)  # Importing the custom logger setup
+from google.cloud.workflows.executions_v1 import ExecutionsClient
 from fastapi import FastAPI, HTTPException
+import uvicorn  # Importing uvicorn
 
-max_calls_per_minute = 30
-call_interval = 60 / max_calls_per_minute
+# Set up the logger from shared_functions
+logger = setup_logger()
 
+# Configuration
+project_id = "shabubsinc"
+region = "europe-west1"
+processing_workflow_name = "ohlc_workflow"  # Changed to the processing workflow
+
+
+# Get API key for the headers
 api_key = access_secret_version("shabubsinc", "coinapi-key")
 headers = {"X-CoinAPI-Key": api_key}
 
+# Initialize FastAPI app
 app = FastAPI()
-publisher = pubsub_v1.PublisherClient()
-topic_path = publisher.topic_path("shabubsinc", "trigger-clean-ohlc")
+
+# Initialize the Workflows Execution client
+executions_client = ExecutionsClient()
 
 
-@app.post("/ingest/ohlc/raw")
+@app.post("/")
 def ingest_ohlc_raw():
-    ohlc_data = fetch_ohlc_data_from_api(headers)
-
-    raw_ohlc_data = bigquery_raw_data_table(
-        bigquery_client=bigquery_client,
-        dataset_id="shabubsinc_db",
-        table_id="raw_hourly_ohlc_data",
-        api_data=ohlc_data,
-    )
-
     try:
+        logger.info("Starting data ingestion process...")
+
+        # Fetch OHLC data from the API
+        ohlc_data = fetch_ohlc_data_from_api(headers)
+        if not ohlc_data:
+            logger.error("OHLC data is None or empty.")
+            raise HTTPException(status_code=500, detail="Failed to fetch OHLC data")
+        logger.info(f"OHLC data fetched: {ohlc_data}")
+
+        # Prepare raw OHLC data for BigQuery
+        raw_ohlc_data = bigquery_raw_data_table(
+            bigquery_client=bigquery_client,
+            dataset_id="shabubsinc_db",
+            table_id="raw_hourly_ohlc_data",
+            api_data=ohlc_data,
+        )
+        if not raw_ohlc_data:
+            logger.error("Raw OHLC data preparation failed.")
+            raise HTTPException(
+                status_code=500, detail="Failed to prepare raw OHLC data"
+            )
+        logger.info("Prepared raw OHLC data for BigQuery")
+
+        # Stream data to BigQuery
         stream_data_to_bigquery(
             bigquery_client=bigquery_client,
             data=raw_ohlc_data,
@@ -41,15 +68,31 @@ def ingest_ohlc_raw():
             dataset_id="shabubsinc_db",
             table_id="raw_hourly_ohlc_data",
         )
+        logger.info("Data streamed to BigQuery successfully")
 
-        publisher.publish(topic_path, b"Trigger clean processing for ohlc")
+        # Trigger the Cloud Workflow for processing after ingestion
+        # execution = Execution(argument="{}")
+        # parent = f"projects/{project_id}/locations/{region}/workflows/{processing_workflow_name}"
 
+        # try:
+        #    #response = executions_client.create_execution(parent=parent, execution=execution)
+        #    logger.info(f"Processing workflow triggered: {response.name}")
+        # except Exception as e:
+        #    logger.exception(f"Failed to trigger processing workflow: {e}")
+        #    raise HTTPException(status_code=500, detail=f"Failed to trigger processing workflow: {str(e)}")
+
+        # Return success response
         return {"status": "success"}
 
     except Exception as e:
-        logging.error(f"Failed to stream data to BigQuery: {e}")
-        raise HTTPException(status_code=500, detail="Data ingestion failed")
+        logger.exception(f"Failed to process OHLC data: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Data ingestion and processing failed: {str(e)}"
+        )
 
 
+# nosec
+# Ensure FastAPI runs with Uvicorn in Cloud Run
 if __name__ == "__main__":
-    ingest_ohlc_raw()
+    # Use uvicorn to serve the FastAPI app
+    uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec

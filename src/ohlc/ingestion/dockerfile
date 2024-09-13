@@ -1,23 +1,22 @@
-# Use an official Python runtime as a base image
+# Dockerfile for OHLC Processing
+
+# Use Python base image
 FROM python:3.10-slim
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file to the container
+# Copy requirements.txt to the container
 COPY requirements.txt .
 
-# Install dependencies from requirements.txt
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the built shared_functions package (.tar.gz or .whl) from dist/ into the container
-COPY ../../../../dist/shared_functions-0.1.tar.gz /app/shared_functions-0.1.tar.gz
+# Copy the entire application code, including shared_functions into the container
+COPY . /app
 
-# Install the shared_functions package from the tar.gz
-RUN pip install /app/shared_functions-0.1.tar.gz
+# Expose port (if needed)
+EXPOSE 8080
 
-# Copy the rest of the OHLC ingestion code
-COPY . .
-
-# Command to run the OHLC ingestion service
-CMD ["python", "main.py"]
+# Start the FastAPI server
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

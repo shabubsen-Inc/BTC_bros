@@ -1,0 +1,63 @@
+main:
+  steps:
+    # Step 1: Assign the correct OHLC ingestion service URL and processing service URL
+    - init:
+        assign:
+          - ohlc_ingestion_service_url: "https://ohlc-ingestion-service-332537701718.europe-west1.run.app"
+          - ohlc_processing_service_url: "https://ohlc-processing-service-7x6gclrt6a-ew.a.run.app"  # URL of the processing service
+
+    # Step 2: Trigger OHLC Ingestion Service
+    - trigger_ohlc_ingestion:
+        call: http.post
+        args:
+          url: "${ohlc_ingestion_service_url}"
+          auth:
+            type: OIDC
+          body:
+            trigger: "start_ingestion"
+          headers:
+            Content-Type: "application/json"
+        result: ohlc_ingestion_response
+    
+    # Step 3: Check the ingestion response status
+    - check_ohlc_ingestion:
+        switch:
+          # Check if the 'status' field exists and is equal to 'success'
+          - condition: '${"status" in ohlc_ingestion_response.body and ohlc_ingestion_response.body.status == "success"}'
+            next: trigger_processing
+          # Check if the 'status' field exists and is equal to 'failure'
+          - condition: '${"status" in ohlc_ingestion_response.body and ohlc_ingestion_response.body.status == "failure"}'
+            raise: "OHLCIngestionFailed"
+          # Fallback for unexpected or missing statuses
+          - condition: 'true'
+            raise: "UnexpectedResponse"
+
+    # Step 4: Trigger OHLC Processing Service after successful ingestion
+    - trigger_processing:
+        call: http.post
+        args:
+          url: "${ohlc_processing_service_url}"
+          auth:
+            type: OIDC
+          body:
+            trigger: "start_processing"
+          headers:
+            Content-Type: "application/json"
+        result: ohlc_processing_response
+
+    # Step 5: Check the processing response status
+    - check_ohlc_processing:
+        switch:
+          # Check if the 'status' field exists and is equal to 'success'
+          - condition: '${"status" in ohlc_processing_response.body and ohlc_processing_response.body.status == "success"}'
+            next: done
+          # Check if the 'status' field exists and is equal to 'failure'
+          - condition: '${"status" in ohlc_processing_response.body and ohlc_processing_response.body.status == "failure"}'
+            raise: "OHLCProcessingFailed"
+          # Fallback for unexpected or missing statuses
+          - condition: 'true'
+            raise: "UnexpectedProcessingResponse"
+
+    # Step 6: Workflow completion
+    - done:
+        return: "OHLC Ingestion and Processing completed successfully"
