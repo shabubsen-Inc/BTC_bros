@@ -9,7 +9,6 @@ from shared_functions import (
 )
 from shared_functions.logger_setup import setup_logger  # Importing the custom logger setup
 from google.cloud.workflows.executions_v1 import ExecutionsClient
-from google.cloud.workflows.executions_v1.types import Execution
 from fastapi import FastAPI, HTTPException
 import uvicorn  # Importing uvicorn
 

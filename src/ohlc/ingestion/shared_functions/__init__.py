@@ -14,4 +14,3 @@ from .filter_duplicates import filter_duplicates_ohlc as filter_duplicates_ohlc
 from .filter_duplicates import (
     filter_duplicates_fear_greed as filter_duplicates_fear_greed,
 )
-from .secret_manager import access_secret_version

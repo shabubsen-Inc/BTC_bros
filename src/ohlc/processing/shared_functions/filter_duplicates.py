@@ -8,9 +8,6 @@ from shared_functions.datetime_helper import (
 )
 
 
-from datetime import datetime
-import logging
-
 def filter_duplicates_ohlc(
     bigquery_client: bigquery.Client,
     dataset_id: str,

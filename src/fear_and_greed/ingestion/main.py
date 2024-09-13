@@ -1,4 +1,3 @@
-from google.cloud import workflows_v1
 from fetch_fear_greed_data import fetch_fear_greed_data
 from shared_functions import (
     bigquery_raw_data_table,
