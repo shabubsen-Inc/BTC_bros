@@ -24,7 +24,6 @@ def ensure_bigquery_ohlc_table(
     table_ref = dataset_ref.table(table_id)
 
     try:
-        print(1)
         # Check if the table already exists
         table = bigquery_client.get_table(table_ref)
         logging.info(
@@ -33,7 +32,6 @@ def ensure_bigquery_ohlc_table(
 
         # Check if the table has a schema
         if not table.schema:
-            print(2)
             logging.info("Table exists but has no schema. Updating the table schema.")
             table.schema = desired_schema
             bigquery_client.update_table(table, ["schema"])
@@ -41,7 +39,6 @@ def ensure_bigquery_ohlc_table(
                 f"Schema updated for table {table.project}.{table.dataset_id}.{table.table_id}"
             )
         else:
-            print(3)
             logging.info(
                 "Table already has a schema. No need to create or update the table."
             )
@@ -57,10 +54,8 @@ def ensure_bigquery_ohlc_table(
             logging.info(
                 f"Created table {table.project}.{table.dataset_id}.{table.table_id}"
             )
-            print("created a new table")
 
         except NotFound as e:
-            print(5)
             logging.error(
                 f"Failed to create table because the dataset or table was not found: {e}"
             )
