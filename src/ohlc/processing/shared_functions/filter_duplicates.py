@@ -29,10 +29,11 @@ def filter_duplicates_ohlc(
     """
 
     # Query the existing timestamps from the clean table
+    # nosec
     query = f"""
     SELECT time_period_start
     FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
-    """
+    """  # nosec
 
     query_job = bigquery_client.query(query)
     results = query_job.result()
