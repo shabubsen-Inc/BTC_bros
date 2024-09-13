@@ -25,7 +25,7 @@ def create_or_refresh_materialized_view(
     FROM `{project_id}.{dataset_id}.clean_hourly_ohlc_data` AS ohlc
     LEFT JOIN `{project_id}.{dataset_id}.clean_daily_fear_greed_data` AS fng
     ON DATE(ohlc.time_period_start) = DATE(fng.timestamp)
-    """ # nosec 
+    """  # nosec
 
     try:
         query_job = bigquery_client.query(view_query)
