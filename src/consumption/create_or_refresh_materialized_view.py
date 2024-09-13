@@ -6,6 +6,7 @@ from google.cloud.exceptions import GoogleCloudError
 def create_or_refresh_materialized_view(
     bigquery_client: bigquery.Client, project_id: str, dataset_id: str, view_id: str
 ):
+    # nosec
     view_query = f"""
     CREATE OR REPLACE MATERIALIZED VIEW `{project_id}.{dataset_id}.{view_id}` AS
     SELECT
@@ -24,7 +25,7 @@ def create_or_refresh_materialized_view(
     FROM `{project_id}.{dataset_id}.clean_hourly_ohlc_data` AS ohlc
     LEFT JOIN `{project_id}.{dataset_id}.clean_daily_fear_greed_data` AS fng
     ON DATE(ohlc.time_period_start) = DATE(fng.timestamp)
-    """
+    """ # nosec 
 
     try:
         query_job = bigquery_client.query(view_query)

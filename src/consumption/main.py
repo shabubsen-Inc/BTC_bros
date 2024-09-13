@@ -11,7 +11,7 @@ app = FastAPI()
 def consume():
     try:
 
-        logging.info(f"Triggered consumption to refresh materialized view.")
+        logging.info("Triggered consumption to refresh materialized view.")
 
         create_or_refresh_materialized_view(
             bigquery_client, "shabubsinc", "shabubsinc_db", "mview_consume"
