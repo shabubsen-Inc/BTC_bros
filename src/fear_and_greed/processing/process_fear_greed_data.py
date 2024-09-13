@@ -9,7 +9,7 @@ def ensure_bigquery_fear_greed_table(
 ):
     # Defining schema to use for Fear and Greed Index data
     desired_schema = [
-        bigquery.SchemaField("value", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("value", "INTEGER", mode="REQUIRED"),
         bigquery.SchemaField("value_classification", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("timestamp", "TIMESTAMP", mode="REQUIRED"),
     ]
