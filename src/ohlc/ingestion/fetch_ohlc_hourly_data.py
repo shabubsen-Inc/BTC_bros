@@ -58,17 +58,19 @@ dates = [
 ]
 
 
-def fetch_ohlc_data_from_api(headers: Dict[str, str], dates: Optional[List[str]] = None) -> Union[List[Dict], Dict]:
+def fetch_ohlc_data_from_api(
+    headers: Dict[str, str], dates: Optional[List[str]] = None
+) -> Union[List[Dict], Dict]:
     """
     Fetches OHLC (Open, High, Low, Close) data from CoinAPI.
-    
+
     If `dates` is provided, fetches 24 hours of data for each date.
     If `dates` is not provided, fetches the latest 1 hour of OHLC data.
-    
+
     Args:
         headers (Dict[str, str]): The headers containing the API destination and key.
         dates (Optional[List[str]]): A list of dates in 'YYYY-MM-DD' format to fetch data for.
-    
+
     Returns:
         Union[List[Dict], Dict]: A list of dictionaries containing OHLC data for multiple dates,
                                  or a single dictionary with the latest OHLC data.
@@ -95,10 +97,10 @@ def fetch_ohlc_data_from_api(headers: Dict[str, str], dates: Optional[List[str]]
                 logging.info(f"Error: {response.status_code} - {response.text}")
 
             else:
-                logging.error('FAILED TO ACHIVE 200 status code')
+                logging.error("FAILED TO ACHIVE 200 status code")
 
         return data_list
-    
+
     else:
         url = "https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/latest?period_id=1HRS&limit=1"
 
@@ -118,4 +120,4 @@ def fetch_ohlc_data_from_api(headers: Dict[str, str], dates: Optional[List[str]]
 
             return data
         else:
-            logging.error('FAILED TO ACHIVE 200 status code')
+            logging.error("FAILED TO ACHIVE 200 status code")
