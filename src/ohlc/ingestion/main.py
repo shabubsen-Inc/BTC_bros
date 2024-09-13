@@ -91,7 +91,8 @@ def ingest_ohlc_raw():
         )
 
 
+# nosec
 # Ensure FastAPI runs with Uvicorn in Cloud Run
 if __name__ == "__main__":
     # Use uvicorn to serve the FastAPI app
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec
