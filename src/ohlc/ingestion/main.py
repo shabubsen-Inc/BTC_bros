@@ -12,8 +12,6 @@ from shared_functions.logger_setup import (
 )  # Importing the custom logger setup
 from google.cloud.workflows.executions_v1 import ExecutionsClient
 from fastapi import FastAPI, HTTPException
-import uvicorn  # Importing uvicorn
-from datetime import datetime, timedelta
 
 
 # Set up the logger from shared_functions
