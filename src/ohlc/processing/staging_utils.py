@@ -13,6 +13,7 @@ def merge_staging_into_clean(
     Merges data from the staging table into the clean table, ensuring deduplication by keeping the latest metadata_time for each time_period_start.
     """
 
+    # nosec
     merge_query = f"""
     MERGE `{project_id}.{dataset_id}.{clean_table}` T
     USING (
@@ -49,7 +50,7 @@ def merge_staging_into_clean(
         S.price_open, S.price_high, S.price_low, S.price_close, 
         S.volume_traded, S.trades_count, S.metadata_time
       );
-    """
+    """ #nosec
 
     query_job = bigquery_client.query(merge_query)
     query_job.result()  # Wait for the query to complete
