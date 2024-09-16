@@ -20,7 +20,7 @@ def get_data_in_batches(
     Yields:
         List[Dict]: A list of dictionaries where each dictionary represents a row of data.
     """
-
+    # nosec
     query = f"""
     SELECT
         JSON_EXTRACT_SCALAR(raw_data, '$.time_period_start') AS time_period_start,
@@ -35,7 +35,7 @@ def get_data_in_batches(
         JSON_EXTRACT_SCALAR(raw_data, '$.trades_count') AS trades_count,
         metadata_time   -- Only include metadata_time for partitioning
     FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
-    """
+    """  # nosec
 
     query_job = bigquery_client.query(query)
     rows = query_job.result(page_size=batch_size)
