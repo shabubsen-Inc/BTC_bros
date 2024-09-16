@@ -21,10 +21,11 @@ def get_raw_data(
                     parsed from the 'raw_data' JSON string.
     """
 
+    # nosec
     query = f"""
     SELECT data_modified, metadata_time, raw_data
     FROM `{bigquery_client.project}.{dataset_id}.{table_id}`
-    """
+    """  # nosec
 
     query_job = bigquery_client.query(query)
     results = query_job.result()

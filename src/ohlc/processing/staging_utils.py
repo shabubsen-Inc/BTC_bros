@@ -50,7 +50,7 @@ def merge_staging_into_clean(
         S.price_open, S.price_high, S.price_low, S.price_close, 
         S.volume_traded, S.trades_count, S.metadata_time
       );
-    """ #nosec
+    """  # nosec
 
     query_job = bigquery_client.query(merge_query)
     query_job.result()  # Wait for the query to complete
