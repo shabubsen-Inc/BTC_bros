@@ -4,7 +4,7 @@ main:
     - init:
         assign:
           - ohlc_ingestion_service_url: "https://ohlc-ingestion-service-332537701718.europe-west1.run.app"
-          - ohlc_processing_service_url: "https://ohlc-processing-service-7x6gclrt6a-ew.a.run.app"  # URL of the processing service
+          - ohlc_processing_service_url: "https://ohlc-processing-service-332537701718.europe-west1.run.app"  # URL of the processing service
 
     # Step 2: Trigger OHLC Ingestion Service
     - trigger_ohlc_ingestion:

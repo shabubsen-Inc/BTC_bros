@@ -1,59 +1,84 @@
-from shared_functions import (
-    stream_data_to_bigquery,
-    bigquery_client,
-    get_raw_data_from_bigquery,
-    filter_duplicates_ohlc,
-)
-from process_ohlc_data import ensure_bigquery_ohlc_table
 import logging
 from fastapi import FastAPI, HTTPException
-
+from bigquery_utils import (
+    check_and_create_partitioned_table_if_not_exists,
+    stream_data_to_staging,
+)
+from staging_utils import merge_staging_into_clean
+from shared_functions import bigquery_client
+import uvicorn
+from batch_data import get_data_in_batches
+from process_ohlc_data import ensure_bigquery_ohlc_table
+from clear_staging import (
+    drop_staging_table,
+)  # Or delete_old_rows_from_staging based on your use case
 
 app = FastAPI()
 
 
 @app.post("/")
-def ingest_ohlc_clean():
+def process_ohlc_data():
+    # BigQuery client and table details
+    bq_client = bigquery_client
+    project_id = "shabubsinc"
+    dataset_id = "shabubsinc_db"
+    staging_table = "staging_hourly_ohlc_data"
+    clean_table = "new_clean_hourly_ohlc_data"
+    raw_table = "raw_hourly_ohlc_data"
 
-    ohlc_raw_data = get_raw_data_from_bigquery(
-        bigquery_client=bigquery_client,
-        dataset_id="shabubsinc_db",
-        table_id="raw_hourly_ohlc_data",
-    )
-
-    ensure_bigquery_ohlc_table(
-        bigquery_client=bigquery_client,
-        dataset_id="shabubsinc_db",
-        table_id="clean_hourly_ohlc_data",
-    )
-
-    clean_data = filter_duplicates_ohlc(
-        bigquery_client=bigquery_client,
-        dataset_id="shabubsinc_db",
-        table_id="clean_hourly_ohlc_data",
-        raw_data=ohlc_raw_data,
-    )
-
-    # Check if clean_data is empty after deduplication
-    if not clean_data:
-        logging.info("No new data to insert after deduplication.")
-        return {"status": "success", "message": "No new data to process"}
+    logging.info("Starting OHLC data processing...")
 
     try:
-        # Stream new data to BigQuery only if clean_data is not empty
-        stream_data_to_bigquery(
-            bigquery_client=bigquery_client,
-            data=clean_data,
-            project_id="shabubsinc",
-            dataset_id="shabubsinc_db",
-            table_id="clean_hourly_ohlc_data",
+        # Step 1: Ensure the staging table exists
+        logging.info(f"Checking or creating staging table: {staging_table}.")
+        check_and_create_partitioned_table_if_not_exists(
+            bigquery_client=bq_client, dataset_id=dataset_id, table_id=staging_table
         )
-        return {"status": "success"}
+
+        # Step 2: Ensure the clean table exists
+        logging.info(f"Checking or creating clean table: {clean_table}.")
+        ensure_bigquery_ohlc_table(
+            bigquery_client=bq_client, dataset_id=dataset_id, table_id=clean_table
+        )
+
+        # Step 3: Process raw data in batches
+        batch_size = 10000  # Adjust as needed for optimal performance
+        for batch_data in get_data_in_batches(
+            bq_client, dataset_id, raw_table, batch_size
+        ):
+            if not batch_data:
+                logging.info(f"No data in batch from {raw_table}.")
+                continue
+
+            logging.info(
+                f"Processing batch with {len(batch_data)} rows from {raw_table}."
+            )
+
+            # Step 4: Insert batch data into the staging table
+            stream_data_to_staging(
+                bq_client, project_id, dataset_id, staging_table, batch_data
+            )
+            logging.info(f"Inserted {len(batch_data)} rows into {staging_table}.")
+
+            # Step 5: Merge data from staging into the clean table
+            merge_staging_into_clean(
+                bq_client, project_id, dataset_id, staging_table, clean_table
+            )
+            logging.info(f"Merged batch from {staging_table} into {clean_table}.")
+
+        drop_staging_table(bq_client, project_id, dataset_id, staging_table)
+
+        logging.info("Data processing and merging completed successfully.")
+        return {
+            "status": "success",
+            "message": "Data processed and merged successfully",
+        }
 
     except Exception as e:
-        logging.error(f"Failed to stream hourly ohlc data to BigQuery: {e}")
-        raise HTTPException(status_code=500, detail="Data ingestion failed")
+        logging.error(f"Error during OHLC data processing: {e}")
+        raise HTTPException(status_code=500, detail="Data processing failed")
 
 
 if __name__ == "__main__":
-    ingest_ohlc_clean()
+    # nosec
+    uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec
