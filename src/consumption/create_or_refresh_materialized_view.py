@@ -22,7 +22,7 @@ def create_or_refresh_materialized_view(
         ohlc.trades_count,
         COALESCE(fng.value, 0) AS fear_greed_value,
         COALESCE(fng.value_classification, 'Unknown') AS fear_greed_classification
-    FROM `{project_id}.{dataset_id}.clean_hourly_ohlc_data` AS ohlc
+    FROM `{project_id}.{dataset_id}.new_clean_hourly_ohlc_data` AS ohlc
     LEFT JOIN `{project_id}.{dataset_id}.clean_daily_fear_greed_data` AS fng
     ON DATE(ohlc.time_period_start) = DATE(fng.timestamp)
     """  # nosec
