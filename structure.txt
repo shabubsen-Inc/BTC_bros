@@ -1,43 +1,39 @@
 .
 ├── README.md
-├── build
-│   ├── bdist.linux-x86_64
-│   └── lib
-│       ├── fear_and_greed
-│       │   ├── __init__.py
-│       │   ├── ingestion
-│       │   │   ├── __init__.py
-│       │   │   ├── fetch_fear_greed_data.py
-│       │   │   └── main.py
-│       │   └── processing
-│       │       ├── __init__.py
-│       │       ├── main.py
-│       │       └── process_fear_greed_data.py
-│       ├── ohlc
-│       │   ├── __init__.py
-│       │   ├── ingestion
-│       │   │   ├── __init__.py
-│       │   │   ├── fetch_ohlc_hourly_data.py
-│       │   │   └── main.py
-│       │   └── processing
-│       │       ├── __init__.py
-│       │       ├── main.py
-│       │       └── process_ohlc_data.py
-│       └── shared_functions
-│           ├── __init__.py
-│           ├── bigquery_client.py
-│           ├── bigquery_raw_data_table.py
-│           ├── datetime_helper.py
-│           ├── get_raw_data_from_bigquery.py
-│           └── stream_data_to_bigquery.py
 ├── cloudbuild.yaml
-├── dist
-│   ├── shared_functions-0.1-py3-none-any.whl
-│   └── shared_functions-0.1.tar.gz
+├── consumption_workflow.yaml
+├── fear_greed_workflow.yaml
+├── ohlc_workflow.yaml
+├── pdate_scheduler.sh
 ├── setup.py
 ├── src
 │   ├── __init__.py
 │   ├── config.py
+│   ├── consumption
+│   │   ├── __init__.py
+│   │   ├── create_or_refresh_materialized_view.py
+│   │   ├── dockerfile
+│   │   ├── main.py
+│   │   ├── requirements.txt
+│   │   └── shared_functions
+│   │       ├── __init__.py
+│   │       ├── __pycache__
+│   │       │   ├── __init__.cpython-310.pyc
+│   │       │   ├── bigquery_client.cpython-310.pyc
+│   │       │   ├── bigquery_raw_data_table.cpython-310.pyc
+│   │       │   ├── create_or_refresh_materialized_view.cpython-310.pyc
+│   │       │   ├── datetime_helper.cpython-310.pyc
+│   │       │   ├── filter_duplicates.cpython-310.pyc
+│   │       │   ├── get_raw_data_from_bigquery.cpython-310.pyc
+│   │       │   └── stream_data_to_bigquery.cpython-310.pyc
+│   │       ├── bigquery_client.py
+│   │       ├── bigquery_raw_data_table.py
+│   │       ├── datetime_helper.py
+│   │       ├── filter_duplicates.py
+│   │       ├── get_raw_data_from_bigquery.py
+│   │       ├── logger_setup.py
+│   │       ├── secret_manager.py
+│   │       └── stream_data_to_bigquery.py
 │   ├── fear_and_greed
 │   │   ├── __init__.py
 │   │   ├── ingestion
@@ -46,50 +42,12 @@
 │   │   │   ├── fetch_fear_greed_data.py
 │   │   │   ├── main.py
 │   │   │   ├── requirements.txt
-│   │   │   └── shared_functions
-│   │   │       ├── __init__.py
-│   │   │       ├── __init__.py:Zone.Identifier
-│   │   │       ├── bigquery_client.py
-│   │   │       ├── bigquery_client.py:Zone.Identifier
-│   │   │       ├── bigquery_raw_data_table.py
-│   │   │       ├── bigquery_raw_data_table.py:Zone.Identifier
-│   │   │       ├── datetime_helper.py
-│   │   │       ├── datetime_helper.py:Zone.Identifier
-│   │   │       ├── filter_duplicates.py
-│   │   │       ├── filter_duplicates.py:Zone.Identifier
-│   │   │       ├── get_raw_data_from_bigquery.py
-│   │   │       ├── get_raw_data_from_bigquery.py:Zone.Identifier
-│   │   │       ├── logger_setup.py
-│   │   │       ├── logger_setup.py:Zone.Identifier
-│   │   │       ├── secret_manager.py
-│   │   │       ├── secret_manager.py:Zone.Identifier
-│   │   │       ├── stream_data_to_bigquery.py
-│   │   │       └── stream_data_to_bigquery.py:Zone.Identifier
 │   │   └── processing
 │   │       ├── __init__.py
 │   │       ├── dockerfile
 │   │       ├── main.py
 │   │       ├── process_fear_greed_data.py
 │   │       ├── requirements.txt
-│   │       └── shared_functions
-│   │           ├── __init__.py
-│   │           ├── __init__.py:Zone.Identifier
-│   │           ├── bigquery_client.py
-│   │           ├── bigquery_client.py:Zone.Identifier
-│   │           ├── bigquery_raw_data_table.py
-│   │           ├── bigquery_raw_data_table.py:Zone.Identifier
-│   │           ├── datetime_helper.py
-│   │           ├── datetime_helper.py:Zone.Identifier
-│   │           ├── filter_duplicates.py
-│   │           ├── filter_duplicates.py:Zone.Identifier
-│   │           ├── get_raw_data_from_bigquery.py
-│   │           ├── get_raw_data_from_bigquery.py:Zone.Identifier
-│   │           ├── logger_setup.py
-│   │           ├── logger_setup.py:Zone.Identifier
-│   │           ├── secret_manager.py
-│   │           ├── secret_manager.py:Zone.Identifier
-│   │           ├── stream_data_to_bigquery.py
-│   │           └── stream_data_to_bigquery.py:Zone.Identifier
 │   ├── ohlc
 │   │   ├── __init__.py
 │   │   ├── ingestion
@@ -159,7 +117,6 @@
 │       ├── dependency_links.txt
 │       ├── requires.txt
 │       └── top_level.txt
-├── structure.txt
-└── workflows.yaml
+└── structure.txt
 
-24 directories, 138 files
+16 directories, 141 files
