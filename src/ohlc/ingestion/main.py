@@ -10,7 +10,6 @@ from shared_functions import (
 from shared_functions.logger_setup import (
     setup_logger,
 )  # Importing the custom logger setup
-from google.cloud.workflows.executions_v1 import ExecutionsClient
 from fastapi import FastAPI, HTTPException
 
 
@@ -25,10 +24,8 @@ headers = {"X-CoinAPI-Key": api_key}
 # Initialize FastAPI app
 app = FastAPI()
 
-# Initialize the Workflows Execution client
-executions_client = ExecutionsClient()
 
-
+dates = ["2024-09-16T00:00:00", "2024-09-17T00:00:00"]
 @app.post("/")
 def ingest_ohlc_raw():
 
@@ -36,7 +33,7 @@ def ingest_ohlc_raw():
         logger.info("Starting data ingestion process...")
 
         # Fetch OHLC data from the API
-        ohlc_data = fetch_ohlc_data_from_api(headers=headers)
+        ohlc_data = fetch_ohlc_data_from_api(headers=headers, dates=dates)
         if not ohlc_data:
             logger.error("OHLC data is None or empty.")
             raise HTTPException(status_code=500, detail="Failed to fetch OHLC data")
