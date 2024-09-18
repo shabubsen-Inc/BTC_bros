@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: shared_functions
+Version: 0.1
+Requires-Python: >=3.6
+Requires-Dist: google-cloud-bigquery>=2.20.0
+Requires-Dist: pendulum>=2.1.2

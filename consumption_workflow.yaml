@@ -1,0 +1,30 @@
+main:
+  steps:
+    - init:
+        assign:
+          - consumption_service_url: "https://consumption-service-332537701718.europe-west1.run.app"
+          
+    # Trigger Consumption Service with retry
+    - trigger_consumption_service:
+        call: http.post
+        args:
+          url: "${consumption_service_url}"
+          auth:
+            type: OIDC
+          body:
+            trigger: "start_consumption"
+          headers:
+            Content-Type: "application/json"
+        result: consumption_response
+    
+    - check_consumption:
+        switch:
+          - condition: '${"status" in consumption_response.body and consumption_response.body.status == "success"}'
+            next: done
+          - condition: '${"status" in consumption_response.body and consumption_response.body.status == "failure"}'
+            raise: "OHLCIngestionFailed"
+          - condition: 'true'
+            raise: "UnexpectedResponse"
+
+    - done:
+        return: "Consumption successfully triggered"

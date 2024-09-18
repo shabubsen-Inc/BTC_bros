@@ -1,0 +1,140 @@
+steps:
+  # Step 1: Retrieve the Cloud Run Service Account Key from Secret Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud secrets versions access latest --secret="cloud-run-secret" > /workspace/cloud-run-sa-key.json
+        export GOOGLE_APPLICATION_CREDENTIALS=/workspace/cloud-run-sa-key.json
+        gcloud config set project shabubsinc
+
+  # Step 2: Build Docker image for OHLC Ingestion Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/shabubsinc/ohlc-ingestion-service', 
+      './src/ohlc/ingestion'
+    ]
+
+  # Step 3: Push Docker image for OHLC Ingestion Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shabubsinc/ohlc-ingestion-service']
+
+  # Step 4: Deploy OHLC Ingestion Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'ohlc-ingestion-service',
+      '--image', 'gcr.io/shabubsinc/ohlc-ingestion-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
+    ]
+
+  # Step 5: Build Docker image for OHLC Processing Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/shabubsinc/ohlc-processing-service', 
+      './src/ohlc/processing'
+    ]
+
+  # Step 6: Push Docker image for OHLC Processing Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shabubsinc/ohlc-processing-service']
+
+  # Step 7: Deploy OHLC Processing Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'ohlc-processing-service',
+      '--image', 'gcr.io/shabubsinc/ohlc-processing-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
+    ]
+
+  # Step 8: Build Docker image for Fear & Greed Ingestion Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/shabubsinc/fear-greed-ingestion-service', 
+      './src/fear_and_greed/ingestion'
+    ]
+
+  # Step 9: Push Docker image for Fear & Greed Ingestion Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shabubsinc/fear-greed-ingestion-service']
+
+  # Step 10: Deploy Fear & Greed Ingestion Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'fear-greed-ingestion-service',
+      '--image', 'gcr.io/shabubsinc/fear-greed-ingestion-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
+    ]
+
+  # Step 11: Build Docker image for Fear & Greed Processing Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/shabubsinc/fear-greed-processing-service', 
+      './src/fear_and_greed/processing'
+    ]
+
+  # Step 12: Push Docker image for Fear & Greed Processing Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shabubsinc/fear-greed-processing-service']
+
+  # Step 13: Deploy Fear & Greed Processing Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'fear-greed-processing-service',
+      '--image', 'gcr.io/shabubsinc/fear-greed-processing-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
+    ]
+
+
+  # Step 14: Build Docker image for Consumption Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/shabubsinc/consumption-service', 
+      './src/consumption'
+    ]
+
+  # Step 15: Push Docker image for Consumption Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shabubsinc/consumption-service']
+
+  # Step 16: Deploy Consumption Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'consumption-service',
+      '--image', 'gcr.io/shabubsinc/consumption-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
+    ]
+
+
+# Images to track in GCR
+images:
+  - 'gcr.io/shabubsinc/ohlc-ingestion-service'
+  - 'gcr.io/shabubsinc/ohlc-processing-service'
+  - 'gcr.io/shabubsinc/fear-greed-ingestion-service'
+  - 'gcr.io/shabubsinc/fear-greed-processing-service'
+  - 'gcr.io/shabubsinc/consumption-service'
