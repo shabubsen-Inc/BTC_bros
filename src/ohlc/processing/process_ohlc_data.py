@@ -7,7 +7,6 @@ import logging
 def ensure_bigquery_ohlc_table(
     bigquery_client: bigquery.Client, dataset_id: str, table_id: str
 ):
-
     desired_schema = [
         SchemaField("time_period_start", "TIMESTAMP", mode="REQUIRED"),
         SchemaField("time_period_end", "TIMESTAMP", mode="REQUIRED"),
@@ -44,7 +43,6 @@ def ensure_bigquery_ohlc_table(
             )
 
     except NotFound:
-
         try:
             logging.info(
                 f"Table does not exist. Creating table: {dataset_id}.{table_id}"

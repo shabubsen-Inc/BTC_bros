@@ -14,7 +14,6 @@ app = FastAPI()
 
 @app.post("/")
 def ingest_ohlc_clean():
-
     ohlc_raw_data = get_raw_data_from_bigquery(
         bigquery_client=bigquery_client,
         dataset_id="shabubsinc_db",

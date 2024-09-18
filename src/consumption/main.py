@@ -10,7 +10,6 @@ app = FastAPI()
 @app.post("/")
 def consume():
     try:
-
         logging.info("Triggered consumption to refresh materialized view.")
 
         create_or_refresh_materialized_view(

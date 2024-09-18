@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from src.ohlc.ingestion.fetch_ohlc_hourly_data import fetch_ohlc_data_from_api, API_call_limiter, access_secret_version
+from src.ohlc.ingestion.fetch_ohlc_hourly_data import fetch_ohlc_data_from_api, access_secret_version
 import requests
 
 

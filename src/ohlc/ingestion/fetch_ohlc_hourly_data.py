@@ -34,8 +34,7 @@ def API_call_limiter(
         time.sleep(60)
         call_count = 0
     else:
-        logging.info(
-            f"current call count is {call_count}/ 30 before 60 sec pause")
+        logging.info(f"current call count is {call_count}/ 30 before 60 sec pause")
         time.sleep(call_interval)
 
     return call_count + 1
@@ -45,8 +44,7 @@ def access_secret_version(project_id: str, secret_id: str, version_id="latest"):
     """this function fetches keys from google secret manager"""
     secret_manager_client = secretmanager.SecretManagerServiceClient()
     name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
-    response = secret_manager_client.access_secret_version(request={
-                                                           "name": name})
+    response = secret_manager_client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")
 
 
@@ -60,7 +58,9 @@ dates = [
 ]
 
 
-def fetch_ohlc_data_from_api(headers: Dict[str, str], dates: Optional[List[str]] = None) -> Union[List[Dict], Dict]:
+def fetch_ohlc_data_from_api(
+    headers: Dict[str, str], dates: Optional[List[str]] = None
+) -> Union[List[Dict], Dict]:
     response = None  # Initialize response as None
     if dates:
         data_list = []
@@ -82,8 +82,7 @@ def fetch_ohlc_data_from_api(headers: Dict[str, str], dates: Optional[List[str]]
             # Ensure response is not None
             if response and response.status_code == 200:
                 data = response.json()
-                logging.info(
-                    f"Error: {response.status_code} - {response.text}")
+                logging.info(f"Error: {response.status_code} - {response.text}")
             else:
                 logging.error("FAILED TO ACHIEVE 200 status code")
 
