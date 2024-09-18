@@ -21,9 +21,10 @@ logger = logging.getLogger(__name__)
 @app.post("/")
 def ingest_fear_greed_raw():
     try:
+        print("hej")
         # Fetch Fear & Greed data from the API
         fear_greed_data = fetch_fear_greed_data(api_url)
-
+        print(fear_greed_data)
         # Prepare raw data for BigQuery insertion
         raw_fear_greed_data = bigquery_raw_data_table(
             bigquery_client=bigquery_client,
@@ -47,3 +48,7 @@ def ingest_fear_greed_raw():
     except Exception as e:
         logger.error(f"Failed to stream data to BigQuery: {e}")
         raise HTTPException(status_code=500, detail="Data ingestion failed")
+
+
+if __name__ == "__main__":
+    ingest_fear_greed_raw()
