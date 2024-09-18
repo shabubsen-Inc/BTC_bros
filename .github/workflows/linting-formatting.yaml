@@ -24,13 +24,12 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff black
+          pip install ruff black[jupyter]
 
       - name: Run Ruff Lint Check
         run: |
           ruff check src/
 
-      - name: Run Black Formatting Check
+      - name: Run Black Formatting Check for Python Files
         run: |
           black --check src/
-
