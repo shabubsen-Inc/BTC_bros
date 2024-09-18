@@ -133,7 +133,6 @@ steps:
 # Logging and options
 options:
   logging: CLOUD_LOGGING_ONLY
-  logsBucket: "gs://shabubsinc_cloudbuild"
 
 
 # Images to track in GCR
