@@ -7,8 +7,9 @@ import time
 
 PROJECT_ID = "shabubsinc"
 
-start_date_str = "2018-02-05T00:00:00"
-end_date_str = "2019-08-24T00:00:00"
+
+start_date_str = "2024-09-03T00:00:00"
+end_date_str = "2019-09-13T00:00:00"
 
 start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%S")
 end_date = datetime.strptime(end_date_str, "%Y-%m-%dT%H:%M:%S")
@@ -25,7 +26,7 @@ def API_call_limiter(
         max_calls_per_minute (int): The maximum number of API calls allowed per minute.
         call_interval (float): The interval between API calls in seconds. this should be 60/max_calls_per_minute
 
-        imploment like this  call_count = minute_request_limiter(call_count, CALLS_PER_MINUTE, CALL_INTERVAL)
+        Implement like this  call_count = minute_request_limiter(call_count, CALLS_PER_MINUTE, CALL_INTERVAL)
     Returns:
         int: Updated call count after rate limiting.
     """
@@ -61,17 +62,28 @@ dates = [
 def fetch_ohlc_data_from_api(
     headers: Dict[str, str], dates: Optional[List[str]] = None
 ) -> Union[List[Dict], Dict]:
-    response = None  # Initialize response as None
+    response = None
     if dates:
         data_list = []
         for date in dates:
-            url = f"https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/history?period_id=1HRS&time_start={date}T00:00:00&limit=24"
+            url = f"https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/history?period_id=1HRS&time_start={date}&limit=24"
             try:
                 response = requests.get(url, headers=headers, timeout=15)
                 response.raise_for_status()
                 data = response.json()
-                data_list.append(data)
+
+                # Unpack the response if it's a list of dictionaries
+                if isinstance(data, list):
+                    for data_point in data:
+                        # Append each dictionary directly
+                        data_list.append(data_point)
+                elif isinstance(data, dict):
+                    data_list.append(
+                        data
+                    )  # In case it's a single dictionary, append directly
+
                 logging.info(f"Successfully fetched data for {date}.")
+
             except requests.exceptions.HTTPError as http_err:
                 logging.error(f"HTTP error occurred: {http_err}")
             except requests.exceptions.RequestException as err:
@@ -79,12 +91,12 @@ def fetch_ohlc_data_from_api(
             except Exception as e:
                 logging.error(f"An unexpected error occurred: {e}")
 
-            # Ensure response is not None
-            if response and response.status_code == 200:
+            if response.status_code == 200:
                 data = response.json()
                 logging.info(f"Error: {response.status_code} - {response.text}")
+
             else:
-                logging.error("FAILED TO ACHIEVE 200 status code")
+                logging.error("FAILED TO ACHIVE 200 status code")
 
         return data_list
 
@@ -92,7 +104,7 @@ def fetch_ohlc_data_from_api(
         url = "https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/latest?period_id=1HRS&limit=1"
         try:
             response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()  # Raise an HTTPError for non-2xx responses
+            response.raise_for_status()
         except requests.exceptions.HTTPError as http_err:
             logging.error(f"HTTP error occurred: {http_err}")
         except requests.exceptions.RequestException as err:

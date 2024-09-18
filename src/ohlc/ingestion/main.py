@@ -12,15 +12,10 @@ from shared_functions.logger_setup import (
 )  # Importing the custom logger setup
 from google.cloud.workflows.executions_v1 import ExecutionsClient
 from fastapi import FastAPI, HTTPException
-import uvicorn  # Importing uvicorn
+
 
 # Set up the logger from shared_functions
 logger = setup_logger()
-
-# Configuration
-project_id = "shabubsinc"
-region = "europe-west1"
-processing_workflow_name = "ohlc_workflow"  # Changed to the processing workflow
 
 
 # Get API key for the headers
@@ -40,7 +35,7 @@ def ingest_ohlc_raw():
         logger.info("Starting data ingestion process...")
 
         # Fetch OHLC data from the API
-        ohlc_data = fetch_ohlc_data_from_api(headers)
+        ohlc_data = fetch_ohlc_data_from_api(headers=headers)
         if not ohlc_data:
             logger.error("OHLC data is None or empty.")
             raise HTTPException(status_code=500, detail="Failed to fetch OHLC data")
@@ -70,18 +65,6 @@ def ingest_ohlc_raw():
         )
         logger.info("Data streamed to BigQuery successfully")
 
-        # Trigger the Cloud Workflow for processing after ingestion
-        # execution = Execution(argument="{}")
-        # parent = f"projects/{project_id}/locations/{region}/workflows/{processing_workflow_name}"
-
-        # try:
-        #    #response = executions_client.create_execution(parent=parent, execution=execution)
-        #    logger.info(f"Processing workflow triggered: {response.name}")
-        # except Exception as e:
-        #    logger.exception(f"Failed to trigger processing workflow: {e}")
-        #    raise HTTPException(status_code=500, detail=f"Failed to trigger processing workflow: {str(e)}")
-
-        # Return success response
         return {"status": "success"}
 
     except Exception as e:
@@ -94,5 +77,6 @@ def ingest_ohlc_raw():
 # nosec
 # Ensure FastAPI runs with Uvicorn in Cloud Run
 if __name__ == "__main__":
+    ingest_ohlc_raw()
     # Use uvicorn to serve the FastAPI app
-    uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec
+    # uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec
