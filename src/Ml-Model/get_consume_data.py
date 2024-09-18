@@ -1,6 +1,5 @@
 from google.cloud import bigquery
 from google.cloud.exceptions import GoogleCloudError
-from typing import List
 import pandas as pd
 import logging
 
@@ -8,8 +7,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-def get_raw_data(
-    bigquery_client: bigquery.Client, dataset_id: str, view_id: str
+def get_consume_data(
+    bigquery_client: bigquery.Client, dataset_id: str, view_id: str, training: bool
 ) -> pd.DataFrame:
     """
     Retrieves data from a BigQuery view and returns it as a Pandas DataFrame.
@@ -23,11 +22,19 @@ def get_raw_data(
         pd.DataFrame: A Pandas DataFrame containing the retrieved data.
     """
     # nosec
-    query = f"""
-    SELECT *
-    FROM `{bigquery_client.project}.{dataset_id}.{view_id}`
-    ORDER BY time_period_start DESC
-    """  # nosec
+    if training:
+        query = f"""
+        SELECT *
+        FROM `{bigquery_client.project}.{dataset_id}.{view_id}`
+        ORDER BY time_period_start DESC LIMIT 1;
+        """  # nosec
+    elif not training:
+        query = f"""
+        SELECT *
+        FROM `{bigquery_client.project}.{dataset_id}.{view_id}`
+        WHERE time_period_start >= '2018-02-02'
+        ORDER BY time_period_start
+        """  # nosec
 
     try:
         logging.info(f"Running query on view: {view_id} in dataset: {dataset_id}")
