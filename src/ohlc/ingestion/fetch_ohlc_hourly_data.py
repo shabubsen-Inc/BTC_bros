@@ -61,8 +61,7 @@ dates = [
 
 def fetch_ohlc_data_from_api(
     headers: Dict[str, str], dates: Optional[List[str]] = None
-) -> Union[List[Dict], Dict]:
-    response = None
+) -> Union[List[Dict], Optional[Dict]]:
     if dates:
         data_list = []
         for date in dates:
@@ -86,10 +85,14 @@ def fetch_ohlc_data_from_api(
 
             except requests.exceptions.HTTPError as http_err:
                 logging.error(f"HTTP error occurred: {http_err}")
+                return None
             except requests.exceptions.RequestException as err:
                 logging.error(f"Request failed: {err}")
+                return None
+
             except Exception as e:
                 logging.error(f"An unexpected error occurred: {e}")
+                return None
 
             if response.status_code == 200:
                 data = response.json()
@@ -117,5 +120,7 @@ def fetch_ohlc_data_from_api(
             data = response.json()
             logging.info(f"Error: {response.status_code} - {response.text}")
             return data
+
         else:
             logging.error("FAILED TO ACHIEVE 200 status code")
+            return None
