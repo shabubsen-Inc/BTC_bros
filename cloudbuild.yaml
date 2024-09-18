@@ -130,6 +130,29 @@ steps:
       '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
     ]
 
+  # Step 17: Build Docker image for ML Model Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/shabubsinc/ml-model-service', 
+      './src/Ml-Model'
+    ]
+
+  # Step 18: Push Docker image for ML Model Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shabubsinc/ml-model-service']
+
+  # Step 19: Deploy ML Model Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'ml-model-service',
+      '--image', 'gcr.io/shabubsinc/ml-model-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
+    ]
 
 # Images to track in GCR
 images:

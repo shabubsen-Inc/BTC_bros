@@ -1,0 +1,33 @@
+main:
+  steps:
+    # Step 1: Initialize the ML service URL
+    - init:
+        assign:
+          - ml_service_url: "https://ml-model-service-332537701718.europe-west1.run.app"
+
+    # Step 2: Trigger the ML service with retry logic
+    - trigger_ml_service:
+        call: http.post
+        args:
+          url: "${ml_service_url}"
+          auth:
+            type: OIDC
+          body:
+            trigger: "start_ml_model"
+          headers:
+            Content-Type: "application/json"
+        result: ml_service_response
+    
+    # Step 3: Check if the ML service was successfully triggered
+    - check_ml_service:
+        switch:
+          - condition: '${"status" in ml_service_response.body and ml_service_response.body.status == "success"}'
+            next: done
+          - condition: '${"status" in ml_service_response.body and ml_service_response.body.status == "failure"}'
+            raise: "MLModelProcessingFailed"
+          - condition: 'true'
+            raise: "UnexpectedResponse"
+
+    # Step 4: End step if successful
+    - done:
+        return: "ML model processing successfully triggered"
