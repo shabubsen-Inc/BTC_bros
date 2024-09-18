@@ -5,7 +5,11 @@ from shared_functions import (
     bigquery_client,
 )
 from fastapi import FastAPI, HTTPException
-import logging
+
+from shared_functions.logger_setup import setup_logger
+
+# Set up the logger from shared_functions
+logger = setup_logger()
 
 # API URL for fetching Fear & Greed data
 api_url = "https://api.alternative.me/fng/?limit=1"
@@ -13,15 +17,9 @@ api_url = "https://api.alternative.me/fng/?limit=1"
 # Initialize FastAPI app
 app = FastAPI()
 
-# Logger setup
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
 @app.post("/")
 def ingest_fear_greed_raw():
     try:
-        print("hej")
         # Fetch Fear & Greed data from the API
         fear_greed_data = fetch_fear_greed_data(api_url)
         print(fear_greed_data)

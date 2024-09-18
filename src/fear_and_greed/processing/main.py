@@ -11,9 +11,10 @@ from process_fear_greed_data import (
 from fastapi import FastAPI, HTTPException
 import logging
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from shared_functions.logger_setup import setup_logger
+
+# Set up the logger from shared_functions
+logger = setup_logger()
 
 app = FastAPI()
 
