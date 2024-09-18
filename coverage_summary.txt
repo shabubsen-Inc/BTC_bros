@@ -1,0 +1,22 @@
+Name                                                       Stmts   Miss  Cover
+------------------------------------------------------------------------------
+src/__init__.py                                                0      0   100%
+src/consumption/__init__.py                                    0      0   100%
+src/consumption/create_or_refresh_materialized_view.py        14      1    93%
+src/fear_and_greed/__init__.py                                 0      0   100%
+src/fear_and_greed/ingestion/__init__.py                       0      0   100%
+src/fear_and_greed/ingestion/fetch_fear_greed_data.py         12      0   100%
+src/fear_and_greed/processing/__init__.py                      0      0   100%
+src/fear_and_greed/processing/process_fear_greed_data.py      42     21    50%
+src/ohlc/__init__.py                                           0      0   100%
+src/ohlc/ingestion/__init__.py                                 0      0   100%
+src/ohlc/ingestion/fetch_ohlc_hourly_data.py                  72     32    56%
+src/ohlc/processing/__init__.py                                0      0   100%
+src/ohlc/processing/process_ohlc_data.py                      29      8    72%
+tests/test_create_or_refresh_mview.py                         19      1    95%
+tests/test_fear_and_greed.py                                  21      1    95%
+tests/test_ohlc_fetch.py                                      30      6    80%
+tests/test_ohlc_processing.py                                 21      1    95%
+tests/test_process_fear_greed_data.py                         21      1    95%
+------------------------------------------------------------------------------
+TOTAL                                                        281     72    74%
