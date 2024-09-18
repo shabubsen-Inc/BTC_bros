@@ -38,7 +38,6 @@ def ensure_bigquery_fear_greed_table(
             )
 
     except NotFound:
-
         try:
             logging.info(
                 f"Table does not exist. Creating table: {dataset_id}.{table_id}"
@@ -70,7 +69,6 @@ def extract_required_fields(data):
     """
     extracted_data = []
     for row in data:
-
         if isinstance(row, dict):
             # Extract the desired fields
             value = row.get("value")

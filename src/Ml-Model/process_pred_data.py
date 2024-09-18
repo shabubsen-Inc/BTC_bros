@@ -3,9 +3,8 @@ from google.cloud.bigquery import SchemaField
 import logging
 from google.cloud.exceptions import NotFound
 
-def ensure_pred_table(
-    bigquery_client: bigquery.Client, dataset_id: str, table_id: str
-):
+
+def ensure_pred_table(bigquery_client: bigquery.Client, dataset_id: str, table_id: str):
     # Define the desired schema for the new columns
     desired_schema = [
         SchemaField("time_period_start", "TIMESTAMP", mode="REQUIRED"),
@@ -58,7 +57,7 @@ def ensure_pred_table(
 
             # Create the table
             table = bigquery.Table(table_ref, schema=desired_schema)
-           
+
             table = bigquery_client.create_table(table)
             logging.info(
                 f"Created table {table.project}.{table.dataset_id}.{table.table_id}"

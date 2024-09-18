@@ -26,9 +26,10 @@ app = FastAPI()
 
 
 dates = ["2024-09-16T00:00:00", "2024-09-17T00:00:00"]
+
+
 @app.post("/")
 def ingest_ohlc_raw():
-
     try:
         logger.info("Starting data ingestion process...")
 

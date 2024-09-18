@@ -27,7 +27,7 @@ def stream_df_to_bigquery(
     table = f"{project_id}.{dataset_id}.{table_id}"
 
     # Convert DataFrame to list of dictionaries (BigQuery format)
-    data = df.to_dict(orient='records')
+    data = df.to_dict(orient="records")
 
     # Ensure the DataFrame has data
     if df.empty:
