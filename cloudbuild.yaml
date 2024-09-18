@@ -105,9 +105,36 @@ steps:
       '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
     ]
 
+
+  # Step 14: Build Docker image for Consumption Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/shabubsinc/consumption-service', 
+      './src/consumption'
+    ]
+
+  # Step 15: Push Docker image for Consumption Service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shabubsinc/consumption-service']
+
+  # Step 16: Deploy Consumption Service to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 
+      'deploy', 
+      'consumption-service',
+      '--image', 'gcr.io/shabubsinc/consumption-service',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--service-account', 'cloud-run-sa@shabubsinc.iam.gserviceaccount.com'
+    ]
+
+
 # Images to track in GCR
 images:
   - 'gcr.io/shabubsinc/ohlc-ingestion-service'
   - 'gcr.io/shabubsinc/ohlc-processing-service'
   - 'gcr.io/shabubsinc/fear-greed-ingestion-service'
   - 'gcr.io/shabubsinc/fear-greed-processing-service'
+  - 'gcr.io/shabubsinc/consumption-service'
