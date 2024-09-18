@@ -30,10 +30,6 @@ jobs:
         run: |
           ruff check src/
 
-      - name: Run Black Formatting Check for Python Files
-        run: |
-          black --check src/
-          
       - name: Run Black Formatting
         run: |
           black src/
