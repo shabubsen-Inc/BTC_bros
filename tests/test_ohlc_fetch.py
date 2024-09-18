@@ -13,6 +13,7 @@ class TestOHLCFetch(unittest.TestCase):
         mock_response.status_code = 200
         mock_response.json.return_value = [
             {"time_period_start": "2024-09-17T00:00:00"}]
+
         mock_get.return_value = mock_response
 
         headers = {"X-CoinAPI-Key": "test_key"}
@@ -21,7 +22,7 @@ class TestOHLCFetch(unittest.TestCase):
 
         self.assertIsNotNone(result)
         self.assertEqual(
-            result[0][0]["time_period_start"], "2024-09-17T00:00:00")
+            result[0]["time_period_start"], "2024-09-17T00:00:00")
 
     @patch('requests.get')
     def test_fetch_ohlc_data_http_error(self, mock_get):
@@ -32,7 +33,7 @@ class TestOHLCFetch(unittest.TestCase):
         result = fetch_ohlc_data_from_api(
             headers=headers, dates=["2024-09-17"])
 
-        self.assertEqual(result, [])
+        self.assertIsNone(result)
 
 
 @patch('src.ohlc.ingestion.fetch_ohlc_hourly_data.secretmanager.SecretManagerServiceClient.access_secret_version')
