@@ -61,34 +61,21 @@ dates = [
 
 def fetch_ohlc_data_from_api(
     headers: Dict[str, str], dates: Optional[List[str]] = None
-) -> Union[List[Dict], Dict]:
-    """
-    Fetches OHLC (Open, High, Low, Close) data from CoinAPI.
-
-    If `dates` is provided, fetches 24 hours of data for each date.
-    If `dates` is not provided, fetches the latest 1 hour of OHLC data.
-
-    Args:
-        headers (Dict[str, str]): The headers containing the API destination and key.
-        dates (Optional[List[str]]): A list of dates in 'YYYY-MM-DD' format to fetch data for.
-
-    Returns:
-        Union[List[Dict], Dict]: A list of dictionaries containing OHLC data for multiple dates,
-                                 or a single dictionary with the latest OHLC data.
-    """
+) -> Union[List[Dict], Optional[Dict]]:
     if dates:
         data_list = []
         for date in dates:
             url = f"https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/history?period_id=1HRS&time_start={date}&limit=24"
             try:
                 response = requests.get(url, headers=headers, timeout=15)
-                response.raise_for_status()  # Raise an HTTPError if the HTTP request returned an unsuccessful status code
+                response.raise_for_status()
                 data = response.json()
 
                 # Unpack the response if it's a list of dictionaries
                 if isinstance(data, list):
                     for data_point in data:
-                        data_list.append(data_point)  # Append each dictionary directly
+                        # Append each dictionary directly
+                        data_list.append(data_point)
                 elif isinstance(data, dict):
                     data_list.append(
                         data
@@ -98,22 +85,29 @@ def fetch_ohlc_data_from_api(
 
             except requests.exceptions.HTTPError as http_err:
                 logging.error(f"HTTP error occurred: {http_err}")
+                return None
             except requests.exceptions.RequestException as err:
                 logging.error(f"Request failed: {err}")
+                return None
+
             except Exception as e:
                 logging.error(f"An unexpected error occurred: {e}")
+                return None
 
-            if response.status_code != 200:
-                logging.error(f"FAILED TO ACHIEVE 200 status code for {date}")
+            if response.status_code == 200:
+                data = response.json()
+                logging.info(f"Error: {response.status_code} - {response.text}")
+
+            else:
+                logging.error("FAILED TO ACHIVE 200 status code")
 
         return data_list
 
     else:
         url = "https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/latest?period_id=1HRS&limit=1"
-
         try:
             response = requests.get(url, headers=headers, timeout=10)
-
+            response.raise_for_status()
         except requests.exceptions.HTTPError as http_err:
             logging.error(f"HTTP error occurred: {http_err}")
         except requests.exceptions.RequestException as err:
@@ -121,10 +115,12 @@ def fetch_ohlc_data_from_api(
         except Exception as e:
             logging.error(f"An unexpected error occurred: {e}")
 
-        if response.status_code == 200:
+        # Add a check to ensure response is not None
+        if response and response.status_code == 200:
             data = response.json()
             logging.info(f"Error: {response.status_code} - {response.text}")
-
             return data
+
         else:
             logging.error("FAILED TO ACHIEVE 200 status code")
+            return None

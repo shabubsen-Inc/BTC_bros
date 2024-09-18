@@ -31,7 +31,6 @@ executions_client = ExecutionsClient()
 
 @app.post("/")
 def ingest_ohlc_raw():
-
     try:
         logger.info("Starting data ingestion process...")
 
