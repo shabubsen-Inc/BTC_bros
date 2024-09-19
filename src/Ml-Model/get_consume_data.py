@@ -26,14 +26,15 @@ def get_consume_data(
         query = f"""
         SELECT *
         FROM `{bigquery_client.project}.{dataset_id}.{view_id}`
-        ORDER BY time_period_start DESC LIMIT 1;
+        WHERE time_period_start >= '2018-02-02'
+        ORDER BY time_period_start
         """  # nosec
+
     elif not training:
         query = f"""
         SELECT *
         FROM `{bigquery_client.project}.{dataset_id}.{view_id}`
-        WHERE time_period_start >= '2018-02-02'
-        ORDER BY time_period_start
+        ORDER BY time_period_start DESC LIMIT 1;
         """  # nosec
 
     try:
